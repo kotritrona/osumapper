@@ -8,6 +8,9 @@ requirements:
 - node.js
 - ffmpeg
 
+tested env:
+- win10, canopy, python3.5, tf1.9.0, no cuda
+
 current progress:
 
 - stage0 0%
