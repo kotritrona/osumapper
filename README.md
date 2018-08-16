@@ -1,6 +1,13 @@
 # osumapper
 An automatic beatmap generator using Tensorflow / Deep Learning.
 
+requirements:
+- tensorflow v1.9.0
+- common python libs
+- soundfile
+- node.js
+- ffmpeg
+
 current progress:
 
 - stage0 0%
