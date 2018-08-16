@@ -905,6 +905,7 @@ function calculateBezierData(beziers, totalLen) {
  * returns {
  *     c: coords
  *     type: type
+ *     and stuff like that
  * }
  */
 function analyzeSlider(note) {
@@ -1074,6 +1075,143 @@ function analyzeSlider(note) {
     };
 }
 
+/*
+ * This needs to be consistent with the definition in (#7).
+ * Name is irrelevant, just to give a hint what it is.
+ * There are a few more shapes in RND5, but I doubt if that's anywhere useful.
+ */
+function getAllSliderTypes() {
+    return [{
+        index: 0,
+        name: "linear",
+        type: "L",
+        vecLength: 1,
+        repeats: 1,
+        angle: 0,
+        points: [[1, 0]]
+    }, {
+        index: 1,
+        name: "arc-ccw",
+        type: "P",
+        vecLength: 0.97,
+        repeats: 1,
+        angle: -0.40703540572409336,
+        points: [[0.5, 0.1], [0.97, 0]]
+    }, {
+        index: 2,
+        name: "arc-cw",
+        type: "P",
+        vecLength: 0.97,
+        repeats: 1,
+        angle: 0.40703540572409336,
+        points: [[0.5, -0.1], [0.97, 0] ]
+    }, {
+        index: 3,
+        name: "angle-ccw",
+        type: "B",
+        vecLength: 0.97,
+        repeats: 1,
+        angle: -0.20131710837464062,
+        points: [[0.48, 0.1], [0.48, 0.1], [0.97, 0]]
+    }, {
+        index: 4,
+        name: "angle-cw",
+        type: "B",
+        vecLength: 0.97,
+        repeats: 1,
+        angle: 0.20131710837464062,
+        points: [[0.48, -0.1], [0.48, -0.1], [0.97, 0]]
+    }];
+}
+
+function globalizeMap(map) {
+    is_map_loaded = 1;
+    diffSettings = map.diff;
+    timingSections = map.timing.ts;
+    uninheritedSections = map.timing.uts;
+}
+
+function generateSlider(slider) {
+
+    const sliderTypes = getAllSliderTypes();
+
+    if(!slider.sliderGenerator) {
+        return slider;
+    }
+
+    var g = slider.sliderGenerator;
+    var st = sliderTypes[g.type];
+    var dOutAngle = Math.atan2(g.dOut[1], g.dOut[0]);
+    var targetAngle = dOutAngle - st.angle;
+    var points = [];
+    for(let k=0; k<st.points.length; k++) {
+        let p = vecMulNum(st.points[k], g.len);
+
+        /* cos(x+a) = cosx cosa - sinx sina
+         * sin(x+a) = cosx sina + sinx cosa
+         */
+        let rotP = [p[0] * Math.cos(targetAngle) - p[1] * Math.sin(targetAngle), p[0] * Math.sin(targetAngle) + p[1] * Math.cos(targetAngle)];
+        points.push(vecAdd(rotP, [slider.x, slider.y]).map(n => Math.round(n)));
+    }
+    _rsp = [st.type].concat(points.map(a => a.join(":")));
+
+    slider.sliderReverses = st.repeats;
+    slider.sliderLength = g.len;
+    slider.sliderSingleHitsounds = [];
+    slider.sliderExtHitsounds = [];
+    slider.sliderData = analyzeSlider({
+        x: slider.x,
+        y: slider.y,
+        type: slider.type,
+        time: slider.time,
+        sliderPoints: _rsp,
+        sliderLength: g.len,
+        sliderReverses: st.repeats
+    });
+
+    // delete the generator
+    delete slider.sliderGenerator;
+
+    return slider;
+}
+
+function generateSliders(map) {
+    var objArray = map.obj;
+    for(let i=0; i<objArray.length; i++) {
+        var obj = objArray[i];
+        if(obj.type & 2) { // is slider
+            objArray[i] = generateSlider(obj);
+        }
+    }
+    map.obj = objArray;
+}
+
+function newComboEvery2Metronome(hsa, uts) {
+    const comboEngine = require("./newcombo.js");
+    comboEngine.setHitObjectsAndUTS(hsa, uts);
+    comboEngine.setComboWL(8);
+    comboEngine.getHitObjects(hsa);
+    return hsa;
+}
+
+/*
+ * I compressed this code because it was too spaghetti...
+ * The param is like
+ * 1 - 24clap, 2 - 13clap, 3 - redline clap, 4 - 23clap, 5 - 24whistle, 6 - owoc, 7 - ocow, 8 - remove all
+ * 9 - taiko reverse, 10 - metronome finish, 11 - random whistle, 12 - o c occ, 13 - 1clap, 14 - 2clap, 15 - 3 clap, 16 - 4 clap
+ * really amazing code I wrote that time (#grassland)
+ *
+ */
+function makeClaps(param, hoa, dts, dte)
+{
+    var dTimeStart = dts || 0;
+    var dTimeEnd = dte || 19911123;
+    var w = 0;
+    var w2 = 0;
+    for(var i in hoa)if(!(hoa[i].time<dTimeStart||hoa[i].time>dTimeEnd))if(1&hoa[i].type)switch(param){case 1:w=isWhiteLine(hoa[i].time),2==w||4==w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 2:w=isWhiteLine(hoa[i].time),1==w||3==w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 3:w=isWhiteLine(hoa[i].time,3,.5),w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 4:w=isWhiteLine(hoa[i].time),2==w||3==w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 5:w=isWhiteLine(hoa[i].time),2==w||4==w?hoa[i].hitsounds|=2:hoa[i].hitsounds&=29;break;case 6:w=isWhiteLine(hoa[i].time),2==w?(hoa[i].hitsounds|=2,hoa[i].hitsounds&=23):4==w?(hoa[i].hitsounds|=8,hoa[i].hitsounds&=29):hoa[i].hitsounds&=21;break;case 7:w=isWhiteLine(hoa[i].time),4==w?(hoa[i].hitsounds|=2,hoa[i].hitsounds&=23):2==w?(hoa[i].hitsounds|=8,hoa[i].hitsounds&=29):hoa[i].hitsounds&=21;break;case 8:hoa[i].hitsounds=0,hoa[i].extHitsounds="0:0:0";break;case 9:8&hoa[i].hitsounds||2&hoa[i].hitsounds?hoa[i].hitsounds&=21:hoa[i].hitsounds|=2;break;case 10:w=isWhiteLine(hoa[i].time),1==w?hoa[i].hitsounds|=4:hoa[i].hitsounds&=27;break;case 11:Math.random()>.5?hoa[i].hitsounds&=21:hoa[i].hitsounds|=2;break;case 12:w=isWhiteLine(hoa[i].time),w2=isWhiteLine(hoa[i].time,3,.5),2==w||4==w||3==w2?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 13:w=isWhiteLine(hoa[i].time),1==w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 14:w=isWhiteLine(hoa[i].time),2==w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 15:w=isWhiteLine(hoa[i].time),3==w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23;break;case 16:w=isWhiteLine(hoa[i].time),4==w?hoa[i].hitsounds|=8:hoa[i].hitsounds&=23}else if(2&hoa[i].type){var ticks=hoa[i].sliderLength/getSliderLen(hoa[i].time),tickLength=getTickLen(hoa[i].time);if(!hoa[i].sliderSingleHitsounds||hoa[i].sliderSingleHitsounds.length==0){hoa[i].sliderSingleHitsounds=[];for(var j=0;j<=hoa[i].sliderReverses;j++)hoa[i].sliderSingleHitsounds.push(0)}if(!hoa[i].sliderExtHitsounds){hoa[i].sliderExtHitsounds=[];for(j=0;j<=hoa[i].sliderReverses;j++)hoa[i].sliderExtHitsounds.push("0:0");hoa[i].extHitsounds="0:0:0"}for(j=0;j<=hoa[i].sliderReverses;j++){var c_tick=Math.round(hoa[i].time+j*ticks*tickLength);switch(param){case 1:w=isWhiteLine(c_tick),2==w||4==w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 2:w=isWhiteLine(c_tick),1==w||3==w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 3:w=isWhiteLine(c_tick,3,.5),w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 4:w=isWhiteLine(c_tick),2==w||3==w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 5:w=isWhiteLine(c_tick),2==w||4==w?hoa[i].sliderSingleHitsounds[j]|=2:hoa[i].sliderSingleHitsounds[j]&=29;break;case 6:w=isWhiteLine(c_tick),2==w?(hoa[i].sliderSingleHitsounds[j]|=2,hoa[i].sliderSingleHitsounds[j]&=23):4==w?(hoa[i].sliderSingleHitsounds[j]|=8,hoa[i].sliderSingleHitsounds[j]&=29):hoa[i].sliderSingleHitsounds[j]&=21;break;case 7:w=isWhiteLine(c_tick),4==w?(hoa[i].sliderSingleHitsounds[j]|=2,hoa[i].sliderSingleHitsounds[j]&=23):2==w?(hoa[i].sliderSingleHitsounds[j]|=8,hoa[i].sliderSingleHitsounds[j]&=29):hoa[i].sliderSingleHitsounds[j]&=21;break;case 8:hoa[i].sliderSingleHitsounds[j]=0,hoa[i].sliderExtHitsounds[j]="0:0";break;case 10:w=isWhiteLine(c_tick),1==w?hoa[i].sliderSingleHitsounds[j]|=4:hoa[i].sliderSingleHitsounds[j]&=27;break;case 11:Math.random()>.5?hoa[i].sliderSingleHitsounds[j]&=21:hoa[i].sliderSingleHitsounds[j]|=2;break;case 12:w=isWhiteLine(c_tick),w2=isWhiteLine(c_tick,3,.5),2==w||4==w||3==w2?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 13:w=isWhiteLine(c_tick),1==w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 14:w=isWhiteLine(c_tick),2==w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 15:w=isWhiteLine(c_tick),3==w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23;break;case 16:w=isWhiteLine(c_tick),4==w?hoa[i].sliderSingleHitsounds[j]|=8:hoa[i].sliderSingleHitsounds[j]&=23}}}
+    return hoa;
+}
+
 function main()
 {
     var args = process.argv;
@@ -1105,6 +1243,30 @@ function main()
         try {
             var txt = fs.readFileSync(inputfile, 'utf8');
             var json = JSON.parse(txt);
+
+            // this will overwrite it if it existed!!
+            fs.writeFileSync(outputfile, buildOsuFile(json), {encoding: "utf8"});
+            if(mode2 != "q") {
+                output("success! file converted to json.");
+            }
+        }
+        catch(e) {
+            output(e);
+        }
+    }
+    else if(mode == "c") {
+        try {
+            var txt = fs.readFileSync(inputfile, 'utf8');
+            var json = JSON.parse(txt);
+
+            globalizeMap(json);
+
+            generateSliders(json);
+
+            json.obj = newComboEvery2Metronome(json.obj, json.timing.uts);
+
+            json.obj = makeClaps(11, json.obj);
+            json.obj = makeClaps(1, json.obj);
 
             // this will overwrite it if it existed!!
             fs.writeFileSync(outputfile, buildOsuFile(json), {encoding: "utf8"});

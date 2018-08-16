@@ -9,25 +9,27 @@ GLOBAL_VARS = {
 };
 
 # "convert" will also convert the music file, generating wavfile.wav in local path
-def read_osu_file(path, convert=False, wavname="wavfile.wav"):
+def read_osu_file(path, convert=False, wav_name="wavfile.wav", json_name="temp_json_file.json"):
     file_dir = os.path.dirname(os.path.abspath(path));
     
     # ask node.js to convert the .osu file to .json format
     # this is my own converter (not the one on npm) made a few years ago
     # tweaked a little to get it running in node.
     # ... no one cares about that anyways.
-    subprocess.call(["node", "load_map.js", "jq", path, "tmp.json"]);
+    subprocess.call(["node", "load_map.js", "jq", path, json_name]);
     
-    with open("tmp.json", encoding="utf-8") as map_json:
+    with open(json_name, encoding="utf-8") as map_json:
         map_dict = json.load(map_json); # not "loads" it is not a string
         
         if convert:
             mp3_file = os.path.join(file_dir, map_dict["general"]["AudioFilename"]);
-            subprocess.call([GLOBAL_VARS["ffmpeg_path"], "-i", mp3_file, wavname]);
+            subprocess.call([GLOBAL_VARS["ffmpeg_path"], "-i", mp3_file, wav_name]);
     
     # delete the temp json here!!!
+    if json_name == "temp_json_file.json":
+        os.remove(json_name);
     
-    return map_dict, wavname;
+    return map_dict, wav_name;
 
 def get_map_timing_array(map_json, length=-1, divisor=4):
     if length == -1:
@@ -51,7 +53,7 @@ def get_tick_len(map_json, tick):
     uts_a = map_json["timing"]["uts"];
     if tick < uts_a[0]["beginTime"]:
         return uts_a[0]["tickLength"];
-    for uts in uts_a:
+    for uts in reversed(uts_a):
         if tick >= uts["beginTime"]:
             return uts["tickLength"];
 
@@ -59,7 +61,14 @@ def get_slider_len(map_json, tick):
     ts_a = map_json["timing"]["ts"];
     if tick < ts_a[0]["beginTime"]:
         return ts_a[0]["sliderLength"];
-    for ts in ts_a:
+    for ts in reversed(ts_a):
+        if tick >= ts["beginTime"]:
+            return ts["sliderLength"];
+
+def get_slider_len_ts(ts_a, tick):
+    if tick < ts_a[0]["beginTime"]:
+        return ts_a[0]["sliderLength"];
+    for ts in reversed(ts_a):
         if tick >= ts["beginTime"]:
             return ts["sliderLength"];
 
@@ -73,13 +82,15 @@ def get_end_time(note):
     else:
         return note["time"];
         
-def get_all_ticks_and_lengths_from_uts(uts_array, end_time):
+# edited from uts to ts wwww
+def get_all_ticks_and_lengths_from_ts(uts_array, ts_array, end_time):
     # Returns array of all timestamps, ticklens and sliderlens.
     endtimes = ([uts["beginTime"] for uts in uts_array] + [end_time])[1:];
-    ticks = [np.arange(uts["beginTime"], endtimes[i], uts["tickLength"]) for i, uts in enumerate(uts_array)];
-    tick_len = [[uts["tickLength"]] * len(np.arange(uts["beginTime"], endtimes[i], uts["tickLength"])) for i, uts in enumerate(uts_array)];
-    slider_len = [[uts["sliderLength"]] * len(np.arange(uts["beginTime"], endtimes[i], uts["tickLength"])) for i, uts in enumerate(uts_array)];
-    return np.round(np.concatenate(ticks)).astype(int), np.concatenate(tick_len), np.concatenate(slider_len);
+    ticks = [np.arange(uts["beginTime"], endtimes[i], uts["tickLength"] / 4) for i, uts in enumerate(uts_array)];
+    tick_len = [[uts["tickLength"]] * len(np.arange(uts["beginTime"], endtimes[i], uts["tickLength"] / 4)) for i, uts in enumerate(uts_array)];
+    # slider_len = [[ts["sliderLength"]] * len(np.arange(ts["beginTime"], endtimes[i], ts["tickLength"] / 4)) for i, ts in enumerate(ts_array)];
+    slider_len = [get_slider_len_ts(ts_array, tick) for tick in np.concatenate(ticks)];
+    return np.round(np.concatenate(ticks)).astype(int), np.concatenate(tick_len), np.array(slider_len);
 
 def get_end_point(note):
     if note["type"] & 8:
@@ -339,12 +350,12 @@ def read_and_save_osu_file(path, filename = "saved"):
     
     np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
     
-def read_and_save_osu_tester_file(path, filename = "saved"):
-    osu_dict, wav_file = read_osu_file(path, convert = True);
+def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.json"):
+    osu_dict, wav_file = read_osu_file(path, convert = True, json_name=json_name);
     sig, samplerate = soundfile.read(wav_file);
-    file_len = (sig.shape[0] / samplerate * 1000 - 1000);
+    file_len = (sig.shape[0] / samplerate * 1000 - 3000);
     
-    timestamps, tick_lengths, slider_lengths = get_all_ticks_and_lengths_from_uts(osu_dict["timing"]["uts"], file_len);
+    timestamps, tick_lengths, slider_lengths = get_all_ticks_and_lengths_from_ts(osu_dict["timing"]["uts"], osu_dict["timing"]["ts"], file_len);
     ticks = np.array([i for i,k in enumerate(timestamps)]);
     # uts = osu_dict["timing"]["uts"][0];
     # ticks = np.array(list(range(0,int((file_len - uts["beginTime"])/uts["tickLength"]*4))));
