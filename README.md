@@ -22,9 +22,8 @@ current progress:
 - stage6 (completed)
 - stage7 80%
 - stage8 0%
-
 - description 0%
 - more testing 15%
-- create a map and rank it -99,999,999%
-
 - tensorflow.js 0%
+- code comments -550%
+- create a map and rank it -99,999,999%
