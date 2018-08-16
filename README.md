@@ -20,8 +20,8 @@ current progress:
 - stage4 (completed)
 - stage5 (completed)
 - stage6 (completed)
-- stage7 80%
-- stage8 0%
+- stage7 (completed)
+- stage8 37%
 - description 0%
 - more testing 15%
 - tensorflow.js 0%
@@ -30,5 +30,6 @@ current progress:
 
 TODO:
 
+- stream regulation
 - slider shape classification
 - spinner classification (kind of think this is impossible...)
