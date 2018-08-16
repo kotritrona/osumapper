@@ -27,3 +27,8 @@ current progress:
 - tensorflow.js 0%
 - code comments -550%
 - create a map and rank it -99,999,999%
+
+TODO:
+
+- slider shape classification
+- spinner classification (kind of think this is impossible...)
