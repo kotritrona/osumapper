@@ -2,7 +2,7 @@
 An automatic beatmap generator using Tensorflow / Deep Learning.
 
 requirements:
-- tensorflow v1.9.0
+- tensorflow v1.9.0 - v1.10.0
 - common python libs
 - pip install soundfile
 - node.js
@@ -14,7 +14,7 @@ tested env:
 
 current progress:
 
-- stage0 0%
+- stage0 85%
 - stage1 (completed)
 - stage2 (completed)
 - stage3 (completed)
@@ -22,15 +22,15 @@ current progress:
 - stage5 (completed)
 - stage6 (completed)
 - stage7 (completed)
-- stage8 37%
-- description 0%
-- more testing 15%
+- stage8 (?)
+- description 15%
+- more testing 30%
 - tensorflow.js 0%
 - code comments -550%
 - create a map and rank it -99,999,999%
 
 TODO:
 
-- stream regulation
+- stream regulation (done)
 - slider shape classification
 - spinner classification (kind of think this is impossible...)
