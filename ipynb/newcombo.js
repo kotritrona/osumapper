@@ -23,7 +23,8 @@ function getHitObjects(hoa) {
 }
 
 function output(p) {
-    console.log(p);
+    /* NOPE PLZ BE SILENT */
+    // console.log(p);
 }
 
 function nc_open()

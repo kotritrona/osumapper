@@ -827,6 +827,7 @@ const vecSub = (c1, c2) => [c1[0]-c2[0], c1[1]-c2[1]];
 const vecMulNum = (c1, n) => [c1[0]*n, c1[1]*n];
 const vecRound = (c1) => [Math.round(c1[0]), Math.round(c1[1])];
 const vecLen = (c1) => Math.sqrt(c1[0]*c1[0] + c1[1]*c1[1]);
+const vecRotate = (c, a) => [c[0] * Math.cos(a) - c[1] * Math.sin(a), c[0] * Math.sin(a) + c[1] * Math.cos(a)];
 
 function calculateBezierData(beziers, totalLen) {
     var curves = [], remlen = totalLen, lastTangent = [];
@@ -1195,6 +1196,27 @@ function newComboEvery2Metronome(hsa, uts) {
 }
 
 /*
+ * Regularizing streams by putting 1/4 (blue-line) notes in middle of adjacent 1/2 notes, with a random rotation.
+ * Because sometimes it maps streams really weirdly, this will make the map much more playable.
+ * More precisely, it puts the middle note half closer to the note before than the one after, nearly all the time.
+ * Perhaps because of the Sota dataset? those split streams? lol
+ */
+function streamRegularizer(hoa) {
+    for(let i=0; i<hoa.length; i++) {
+        // find streams where 3 notes close to each other
+        if((hoa[i].type & 1) && hoa[i+2] && hoa[i+2].time - hoa[i].time <= getTickLen(hoa[i].time) * 0.53
+            && (hoa[i+1].type & 1) && isWhiteLine2(hoa[i].time, 2)) {
+            var vec = vecMulNum(vecSub([hoa[i+2].x, hoa[i+2].y], [hoa[i].x, hoa[i].y]), 0.5);
+            var vecRotated = vecRotate(vec, Math.random() - 0.5);
+            var vecFinal = vecAdd([hoa[i].x, hoa[i].y], vecRotated).map(Math.floor);
+            hoa[i+1].x = vecFinal[0];
+            hoa[i+1].y = vecFinal[1];
+        }
+    }
+    return hoa;
+}
+
+/*
  * I compressed this code because it was too spaghetti...
  * The param is like
  * 1 - 24clap, 2 - 13clap, 3 - redline clap, 4 - 23clap, 5 - 24whistle, 6 - owoc, 7 - ocow, 8 - remove all
@@ -1263,8 +1285,18 @@ function main()
 
             generateSliders(json);
 
+            json.obj = streamRegularizer(json.obj);
+
             json.obj = newComboEvery2Metronome(json.obj, json.timing.uts);
 
+            /*
+             * Hitsounds can be deep-learned as well, probably, but one main problem is
+             * that most of the maps use a custom hitsound set.
+             * In this way, the hitsound is largely correlated to the hitsound itself, rather from our data.
+             * With a much bigger dataset (#OsuHitsoundCollection!) this should be possible, but it is pointless -
+             *
+             * - because we can do this the easy way!
+             */
             json.obj = makeClaps(11, json.obj);
             json.obj = makeClaps(1, json.obj);
 
