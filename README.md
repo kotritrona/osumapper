@@ -4,7 +4,7 @@ An automatic beatmap generator using Tensorflow / Deep Learning.
 requirements:
 - tensorflow v1.9.0
 - common python libs
-- soundfile
+- pip install soundfile
 - node.js
 - npm i polynomial
 - ffmpeg
