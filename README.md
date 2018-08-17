@@ -6,6 +6,7 @@ requirements:
 - common python libs
 - soundfile
 - node.js
+- npm i polynomial
 - ffmpeg
 
 tested env:
