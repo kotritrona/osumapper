@@ -21,13 +21,37 @@ how to run the model:
 
 if you don't have a good idea about what map to train with, you can use the default model and start from step #5.
 
+model specification:
+- Rhythm model
+  - CNN/LSTM + dense layers
+  - input music FFTs (7 time windows x 32 fft_size x 2 (magnitude, phase)) and timing (divisor, BPM, tick_length, slider_length)
+  - output (is_note, is_circle, is_slider, is_spinner, is_sliding, is_spinning) for 1/-1 classification
+- Momentum model
+  - Same structure as above
+  - output (momentum, angular_momentum) as regression
+  - momentum is distance over time. It should be proportional to circle size which I may implement later.
+  - angular_momentum is angle over time. currently unused.
+- Flow model
+  - uses GAN to generate the flow.
+  - takes 10 notes as a group and train them each time
+  - Generator: some dense layers, input (randomness x 50), output (cos_list x 20, sin_list x 20)
+  - this output is then fed into a map generator to build a map corresponding to the angular values
+  - map constructor output: (x_start, y_start, vector_out_x, vector_out_y, x_end, y_end) x 10
+  - discriminator input: ↑
+  - discriminator output: (1,) ranging from 0 to 1
+  - every big epoch(?), trains generator for 7 epochs and then discriminator 3 epochs
+  - trains 6 ~ 25 big epochs each group. mostly 6 epochs unless the generated map is out of the mapping region (0~512, 0~384).
+- Beatmap Converter
+  - uses node.js to convert between map position data and .osu file
+  - ~~most of its code is from 3 years ago~~
+
 tested env:
 - win10, canopy, python3.5, tf1.9.0, no cuda
 - win10, canopy, python3.5, tf1.10.0, no cuda
 
 current progress:
 
-- stage0 85%
+- stage0 (completed)
 - stage1 (completed)
 - stage2 (completed)
 - stage3 (completed)
