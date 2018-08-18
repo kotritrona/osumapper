@@ -75,6 +75,7 @@ TODO:
 - stream regulation (done)
 - slider shape classification
 - spinner classification (kind of think this is impossible...)
+- play with tensorflow.js to make it easier to use
 
 current problems:
 
