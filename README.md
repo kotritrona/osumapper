@@ -41,8 +41,7 @@ model specification:
   - Generator: some dense layers, input (randomness x 50), output (cos_list x 20, sin_list x 20)
   - this output is then fed into a map generator to build a map corresponding to the angular values
   - map constructor output: (x_start, y_start, vector_out_x, vector_out_y, x_end, y_end) x 10
-  - discriminator input: ↑
-  - discriminator output: (1,) ranging from 0 to 1
+  - Discriminator: simpleRNN, some dense layers, input ↑, output (1,) ranging from 0 to 1
   - every big epoch(?), trains generator for 7 epochs and then discriminator 3 epochs
   - trains 6 ~ 25 big epochs each group. mostly 6 epochs unless the generated map is out of the mapping region (0~512, 0~384).
 - Beatmap Converter
