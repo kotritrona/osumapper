@@ -51,6 +51,7 @@ model specification:
 tested env:
 - win10, canopy, python3.5, tf1.9.0, no cuda
 - win10, canopy, python3.5, tf1.10.0, no cuda
+- google colaboratory, no GPU
 
 current progress:
 
