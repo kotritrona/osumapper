@@ -43,7 +43,7 @@ model specification:
   - map constructor output: (x_start, y_start, vector_out_x, vector_out_y, x_end, y_end) x 10
   - Discriminator: simpleRNN, some dense layers, input ↑, output (1,) ranging from 0 to 1
   - every big epoch(?), trains generator for 7 epochs and then discriminator 3 epochs
-  - trains 6 ~ 25 big epochs each group. mostly 6 epochs unless the generated map is out of the mapping region (0~512, 0~384).
+  - trains 6 ~ 25 big epochs each group. mostly 6 epochs unless the generated map is out of the mapping region (0:512, 0:384).
 - Beatmap Converter
   - uses node.js to convert between map position data and .osu file
   - ~~most of its code is from 3 years ago~~
