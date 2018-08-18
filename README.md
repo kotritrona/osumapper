@@ -1,6 +1,8 @@
 # osumapper
 An automatic beatmap generator using Tensorflow / Deep Learning.
 
+demo map: https://osu.ppy.sh/beatmapsets/834264
+
 requirements:
 - tensorflow v1.9.0 - v1.10.0
 - common python libs
