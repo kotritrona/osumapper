@@ -9,8 +9,21 @@ requirements:
 - npm i polynomial
 - ffmpeg
 
+how to run the model:
+1. prepare a maplist.txt containing .osu files and run 01_osumap_loader.ipynb
+2. run 02_osurhythm_estimator.ipynb
+3. run 03_osurhythm_momentum_estimator.ipynb
+4. have a rest since #4 is not currently used
+5. prepare a new song with timing and run 05_newsong_importer.ipynb
+6. run 06_osurhythm_evaluator.ipynb
+7. run 07_osuflow_evaluator_from_rhythm.ipynb
+8. find the generated .osu file under the ipynb folder and try it out in osu!
+
+if you don't have a good idea about what map to train with, you can use the default model and start from step #5.
+
 tested env:
 - win10, canopy, python3.5, tf1.9.0, no cuda
+- win10, canopy, python3.5, tf1.10.0, no cuda
 
 current progress:
 
