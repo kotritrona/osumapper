@@ -74,8 +74,9 @@ current progress:
 
 TODO:
 
-- stream regulation (done)
+- stream regularization (done)
 - slider shape classification
+- deal with 1/3 and 1/1 maps (parametrize divisor)
 - spinner classification (kind of think this is impossible...)
 - play with tensorflow.js to make it usable for everyone
 
