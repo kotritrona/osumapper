@@ -48,6 +48,6 @@ TODO:
 - slider shape classification
 - spinner classification (kind of think this is impossible...)
 
-current problems
+current problems:
 
-- gcolab randomly crash when loading model if GPU is enabled. => adding sess = tf.InteractiveSession() may fix it, but it will still run out of memory
+- gcolab when GPU is enabled gets out_of_memory or crashes saying it needs 11gb of memory
