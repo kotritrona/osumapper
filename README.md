@@ -50,4 +50,4 @@ TODO:
 
 current problems
 
-- gcolab randomly crash when loading model if GPU is enabled, while i have no idea why it happens
+- gcolab randomly crash when loading model if GPU is enabled
