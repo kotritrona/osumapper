@@ -31,6 +31,9 @@ model specification:
   - output (momentum, angular_momentum) as regression
   - momentum is distance over time. It should be proportional to circle size which I may implement later.
   - angular_momentum is angle over time. currently unused.
+- Slider model
+  - was designed to classify slider lengths and shapes
+  - currently unused
 - Flow model
   - uses GAN to generate the flow.
   - takes 10 notes as a group and train them each time
