@@ -24,7 +24,8 @@ if you don't have a good idea about what map to train with, you can use the defa
 model specification:
 - Rhythm model
   - CNN/LSTM + dense layers
-  - input music FFTs (7 time_windows x 32 fft_size x 2 (magnitude, phase)) and timing (divisor, BPM, tick_length, slider_length)
+  - input music FFTs (7 time_windows x 32 fft_size x 2 (magnitude, phase))
+  - additional input timing (is_1/1, is_1/4, is_1/2, is_the_other_1/4, BPM, tick_length, slider_length)
   - output (is_note, is_circle, is_slider, is_spinner, is_sliding, is_spinning) for 1/-1 classification
 - Momentum model
   - Same structure as above
