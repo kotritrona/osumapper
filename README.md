@@ -50,5 +50,4 @@ TODO:
 
 current problems
 
-- gcolab randomly crash when loading model if GPU is enabled
-adding sess = tf.InteractiveSession() may fix it, but it will still run out of memory
+- gcolab randomly crash when loading model if GPU is enabled. => adding sess = tf.InteractiveSession() may fix it, but it will still run out of memory
