@@ -47,3 +47,7 @@ TODO:
 - stream regulation (done)
 - slider shape classification
 - spinner classification (kind of think this is impossible...)
+
+current problems
+
+- gcolab randomly crash when loading model if GPU is enabled, while i have no idea why it happens
