@@ -1,5 +1,9 @@
 /*
     Node.js version of osu! map file loader
+
+
+
+
  */
 
 // load node_modules
@@ -980,6 +984,13 @@ function analyzeSlider(note) {
         outPoints.push({c: c1, type: "curl"});
         outPoints.push({c: c2, type: "end"});
         var center = calculateCircleCenter(c0, c1, c2);
+
+        // fix degenerate circle bug
+        if(!isFinite(center[0]) || !isFinite(center[1])) {
+            // skip the middle point and change type to linear!
+            note.sliderPoints = ["L", note.sliderPoints[2]];
+            return analyzeSlider(note);
+        }
         var radius = pDist(center, c0);
 
         // calculate the angles to get to where the slider actually ends

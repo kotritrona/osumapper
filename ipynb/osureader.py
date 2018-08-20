@@ -12,24 +12,24 @@ GLOBAL_VARS = {
 # "convert" will also convert the music file, generating wavfile.wav in local path
 def read_osu_file(path, convert=False, wav_name="wavfile.wav", json_name="temp_json_file.json"):
     file_dir = os.path.dirname(os.path.abspath(path));
-    
+
     # ask node.js to convert the .osu file to .json format
     # this is my own converter (not the one on npm) made a few years ago
     # tweaked a little to get it running in node.
     # ... no one cares about that anyways.
     subprocess.call(["node", "load_map.js", "jq", path, json_name]);
-    
+
     with open(json_name, encoding="utf-8") as map_json:
         map_dict = json.load(map_json); # not "loads" it is not a string
-        
+
         if convert:
             mp3_file = os.path.join(file_dir, map_dict["general"]["AudioFilename"]);
             subprocess.call([GLOBAL_VARS["ffmpeg_path"], "-y", "-i", mp3_file, wav_name]);
-    
+
     # delete the temp json here!!!
     if json_name == "temp_json_file.json":
         os.remove(json_name);
-    
+
     return map_dict, wav_name;
 
 def get_map_timing_array(map_json, length=-1, divisor=4):
@@ -82,7 +82,7 @@ def get_end_time(note):
     #    return note["holdEndTime"];
     else:
         return note["time"];
-        
+
 # edited from uts to ts wwww
 def get_all_ticks_and_lengths_from_ts(uts_array, ts_array, end_time):
     # Returns array of all timestamps, ticklens and sliderlens.
@@ -130,8 +130,11 @@ def get_momentum(note, prev_note):
     v1 = np.array([note["x"], note["y"]]);
     v0 = get_end_point(prev_note);
     v = v1 - v0;
+    if note["time"] - get_end_time(prev_note) == 0 or note["time"] - prev_note["time"] == 0:
+        # it has the same time the previous note ends. either a bugged sliderend or a double note
+        return 0;
     end_type_momentum = np.sqrt(v.dot(v)) / (note["time"] - get_end_time(prev_note));
-    
+
     # Since slider jumps in maps cause this parameters to learned too high
     # we try to deal with slider leniency by using the beginning of slider
     v2 = np.array([prev_note["x"], prev_note["y"]]);
@@ -143,10 +146,10 @@ def get_map_notes(map_json, **kwargs):
     length = kwargs.get("length", -1);
     divisor = kwargs.get("divisor", 4);
     tick_times = get_map_timing_array(map_json, length = length, divisor = divisor);
-    
+
     objs = map_json["obj"];
     obj_times = list(map(lambda obj: obj["time"], objs));
-    
+
     def get_note_type(obj):
         if not obj:
             return 0;
@@ -155,7 +158,7 @@ def get_map_notes(map_json, **kwargs):
         elif obj["type"] & 8:
             return 3;
         return 1;
-    
+
     po = 0;
     note_max_wait_time = kwargs.get("note_max_wait_time", 1000);
     start_time = obj_times[0] - note_max_wait_time;
@@ -166,16 +169,16 @@ def get_map_notes(map_json, **kwargs):
     spinner_end_time = 0;
     data = [];
     flow_data = [];
-    
+
     tlen_mp = 1/500;
     tlen_s = 1;
     bpm_mp = 1/120;
     bpm_s = 1;
     slen_mp = 1/150;
     slen_s = 1;
-    
+
     for i, tick in enumerate(tick_times):
-        
+
         # Attach extra vars at the end of each note datum
         tlen = get_tick_len(map_json, tick);
         bpm = 60000 / tlen;
@@ -183,25 +186,25 @@ def get_map_notes(map_json, **kwargs):
         ex1 = tlen * tlen_mp - tlen_s;
         ex2 = bpm * bpm_mp - bpm_s;
         ex3 = slen * slen_mp - slen_s;
-        
+
         while obj_times[po] < tick - 5 and po < len(obj_times) - 1:
             po += 1;
         if obj_times[po] >= tick - 5 and obj_times[po] <= tick + 5: # found note
             last_obj_time = tick;
             note_type = get_note_type(objs[po]);
-            
+
             # calculate momentum
             if po >= 1:
                 momentum = get_momentum(objs[po], objs[po-1]);
             else:
                 momentum = 0;
-            
+
             # calculate angular momentum
             if po >= 2:
                 angular_momentum = get_angular_momentum(objs[po], objs[po-1], objs[po-2]);
             else:
                 angular_momentum = 0;
-            
+
             # flow data
             if po >= 1:
                 input_vector = get_input_vector(objs[po], objs[po-1]);
@@ -213,11 +216,11 @@ def get_map_notes(map_json, **kwargs):
                 input_vector = [0, 0];
             if output_vector is None or output_vector[0] is None or output_vector[1] is None:
                 output_vector = [0, 0];
-                
+
             # end point
             endpoint = get_end_point(objs[po]);
             flow_data.append([i, tick, note_type, objs[po]["x"], objs[po]["y"], input_vector[0], input_vector[1], output_vector[0], output_vector[1], endpoint[0], endpoint[1]]);
-            
+
             # put data
             if note_type == 1:
                 spinning = 0;
@@ -230,7 +233,7 @@ def get_map_notes(map_json, **kwargs):
                 spinner_end_time = objs[po]["spinnerEndTime"];
                 # because the spinner sometimes get over 3 secs
                 last_obj_time = spinner_end_time;
-                
+
             # TICK, TIME, NOTE, NOTE_TYPE, SLIDING, SPINNING, MOMENTUM, ANGULAR_MOMENTUM, Ex1, Ex2, Ex3
             data.append([i, tick, 1, note_type, sliding, spinning, momentum, angular_momentum, ex1, ex2, ex3]);
         elif spinning == 1:
@@ -258,11 +261,11 @@ def get_freqs(sig, fft_size):
     La = np.abs(Lc[0:fft_size//2]);
     Lg = np.angle(Lc[0:fft_size//2]);
     return La, Lg;
-    
+
 def slice_wave_at(ms, sig, samplerate, size):
     ind = (ms/1000 * samplerate)//1;
     return sig[max(0, int(ind - size//2)):int(ind + size - size//2)];
-    
+
 def lrmix(sig):
     return (sig[:,0]+sig[:,1])/2;
 
@@ -270,13 +273,13 @@ def get_wav_data_at(ms, sig, samplerate, size=1024, fft_size=2048, freq_low=0, f
     if freq_high == -1:
         freq_high = samplerate//2;
     waveslice = slice_wave_at(ms, sig, samplerate, size);
-    
+
     # since osu! maps are usually not mapped to stereo wave, let's mix it to reduce 50% of data
     waveslice_lr = lrmix(waveslice);
-    
+
     # do a nice FFT
     La, Lg = get_freqs(waveslice_lr, fft_size);
-    
+
     # cut the frequency bins
     # freq_step * size == samplerate
     # freq_step * k == frequency
@@ -290,20 +293,20 @@ def get_wav_data_at(ms, sig, samplerate, size=1024, fft_size=2048, freq_low=0, f
 def read_wav_data(timestamps, wavfile, snapsize=[1, 2, 4, 8, 16], fft_size = 1024):
     sig, samplerate = soundfile.read(wavfile);
     data = list();
-    
+
     # normalize sound wave
     # sig = sig / np.sqrt(np.mean(sig**2, axis=0));
     sig = sig / np.max(np.max(np.abs(sig), axis=0));
-    
+
     # calc a length array
     tmpts = np.array(timestamps);
     timestamp_interval = tmpts[1:] - tmpts[:-1];
     timestamp_interval = np.append(timestamp_interval, timestamp_interval[-1]);
-    
+
     for sz in snapsize:
         data_r = np.array([get_wav_data_at(coord, sig, samplerate, size=timestamp_interval[i] * sz, fft_size=fft_size, freq_high=samplerate//4) for i, coord in enumerate(timestamps)]);
         data.append(data_r);
-        
+
     raw_data = np.array(data);
     norm_data = np.tile(np.expand_dims(np.mean(raw_data, axis=1), 1), (1, raw_data.shape[1], 1, 1));
     std_data = np.tile(np.expand_dims(np.std(raw_data, axis=1), 1), (1, raw_data.shape[1], 1, 1));
@@ -328,7 +331,7 @@ def read_and_save_osu_file(path, filename = "saved"):
     wav_data = read_wav_data(timestamps, wav_file, snapsize=[0.25, 0.5, 1, 2, 4, 8, 16], fft_size = 128);
     # in order to match first dimension
     wav_data = np.swapaxes(wav_data, 0, 1);
-    
+
     # change the representation of note_type
     # a bit of copypaste code because I changed the data structure many times here
     transformed_data = [];
@@ -345,28 +348,28 @@ def read_and_save_osu_file(path, filename = "saved"):
             transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 0, 1, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
         else:
             transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
-    
+
     # import pandas as pd;
     # pd.DataFrame(flow_data).to_csv("flow.csv", header=["TICK", "TIME", "TYPE", "X", "Y", "IN_DX", "IN_DY", "OUT_DX", "OUT_DY"]);
-    
+
     np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
-    
+
 def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.json"):
     osu_dict, wav_file = read_osu_file(path, convert = True, json_name=json_name);
     sig, samplerate = soundfile.read(wav_file);
     file_len = (sig.shape[0] / samplerate * 1000 - 3000);
-    
+
     timestamps, tick_lengths, slider_lengths = get_all_ticks_and_lengths_from_ts(osu_dict["timing"]["uts"], osu_dict["timing"]["ts"], file_len);
     ticks = np.array([i for i,k in enumerate(timestamps)]);
     # uts = osu_dict["timing"]["uts"][0];
     # ticks = np.array(list(range(0,int((file_len - uts["beginTime"])/uts["tickLength"]*4))));
     # timestamps = np.floor(ticks * uts["tickLength"]/4 + uts["beginTime"]);
     extra = np.array([60000 / tick_lengths, slider_lengths]);
-    
+
     wav_data = read_wav_data(timestamps, wav_file, snapsize=[0.25, 0.5, 1, 2, 4, 8, 16], fft_size = 128);
     # in order to match first dimension
     wav_data = np.swapaxes(wav_data, 0, 1);
-    
+
     np.savez_compressed(filename, ticks = ticks, timestamps = timestamps, wav = wav_data, extra = extra);
 
 def read_and_return_osu_file(path):
