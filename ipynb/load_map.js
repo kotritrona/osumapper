@@ -1,9 +1,5 @@
 /*
     Node.js version of osu! map file loader
-
-
-
-
  */
 
 // load node_modules
