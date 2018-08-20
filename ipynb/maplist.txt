@@ -1,1 +1,2 @@
-#Add directories to .osu files here!
+#Add directories to .osu files here! Heres an example:
+#D:\StudyData\Tensorflow\sota\167564 Sota Fujimori - DANCE ALL NIGHT\Sota Fujimori - DANCE ALL NIGHT (arom303) [Insane].osu
