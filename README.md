@@ -5,7 +5,7 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 
 ![Diagram of structure](osunn_structure.jpg)
 
-##Model Specification:
+## Model Specification:
 - Rhythm model
   - CNN/LSTM + dense layers
   - input music FFTs (7 time_windows x 32 fft_size x 2 (magnitude, phase))
@@ -32,7 +32,7 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
   - uses node.js to convert between map position data and .osu file
   - ~~most of its code is from 3 years ago~~
 
-##Requirements:
+## Requirements:
 - tensorflow v1.9.0 - v1.10.0
 - common python libs
 - soundfile
@@ -40,7 +40,7 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 - polynomial
 - ffmpeg
 
-##Running the model:
+## Running the model:
 1. prepare a maplist.txt containing .osu files and run 01_osumap_loader.ipynb
 2. run 02_osurhythm_estimator.ipynb
 3. run 03_osurhythm_momentum_estimator.ipynb
@@ -52,12 +52,12 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 
 if you don't have a good idea about what map to train with, you can use the default model and start from step #5.
 
-##Environments tested:
+## Environments tested:
 - win10, canopy, python3.5, tf1.9.0, no cuda
 - win10, canopy, python3.5, tf1.10.0, no cuda
 - google colaboratory, no GPU
 
-##Current Progress:
+## Current Progress:
 
 - stage0 (completed)
 - stage1 (completed)
@@ -74,7 +74,7 @@ if you don't have a good idea about what map to train with, you can use the defa
 - code comments -550%
 - create a map and rank it -99,999,999%
 
-##TODO:
+## TODO:
 
 - stream regularization (done)
 - slider shape classification
