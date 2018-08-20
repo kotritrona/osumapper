@@ -3,9 +3,9 @@ An automatic beatmap generator using Tensorflow / Deep Learning.
 
 demo map: https://osu.ppy.sh/beatmapsets/834264
 
+## Model Specification:
 ![Diagram of structure](osunn_structure.jpg)
 
-## Model Specification:
 - Rhythm model
   - CNN/LSTM + dense layers
   - input music FFTs (7 time_windows x 32 fft_size x 2 (magnitude, phase))
