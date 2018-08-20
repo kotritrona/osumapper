@@ -3,6 +3,9 @@ An automatic beatmap generator using Tensorflow / Deep Learning.
 
 demo map: https://osu.ppy.sh/beatmapsets/834264
 
+[Diagram of structure](osunn_structure.jpg)
+
+
 requirements:
 - tensorflow v1.9.0 - v1.10.0
 - common python libs
