@@ -124,7 +124,7 @@ def get_angular_momentum(note, prev_note, prev2_note):
     v0 = get_output_vector(prev_note, prev2_note);
     if v0 is None or v1 is None or v0[0] is None or v1[0] is None:
         return 0;
-    return (np.arctan2(v1[1], v1[0]) - np.arctan2(v0[1], v0[0])) / (note["time"] - get_end_time(prev_note));
+    return (np.arctan2(v1[1], v1[0]) - np.arctan2(v0[1], v0[0])) / max(10, (note["time"] - get_end_time(prev_note)));
 
 def get_momentum(note, prev_note):
     v1 = np.array([note["x"], note["y"]]);
