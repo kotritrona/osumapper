@@ -57,7 +57,7 @@ if you don't have a good idea about what map to train with, you can use the defa
 - win10, canopy, python3.5, tf1.10.0, no cuda
 - google colaboratory, no GPU
 - anaconda3, python3.6, tf1.10.0, the machine has no graphics card
-- previous environments with GPU enabled - must set batch_size=20 when training!!
+- previous environments with GPU enabled - must set batch_size=20 when training, otherwise it will OOM!!
 
 ## Current Progress:
 
