@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta charset="utf-8" />
+		<meta name="format-detection" content="telephone=no, email=no, address=no" />
+		<title>tensorflow test</title>
+		<link rel="stylesheet" type="text/css" href="ar3.css" />
+    <script src="ar3.js" type="text/javascript"></script>
+    <!-- someone ported numpy to js!!!! -->
+    <script src="numjs.min.js" type="text/javascript"></script>
+    <script src="flow_evaluator.js" type="text/javascript"></script>
+		<!-- <script src="tf.js" type="text/javascript"></script> -->
+		<script>
+		var printedLines = 0;
+		function print(...z) {
+			if(printedLines > 30) {
+				$I("out").value = $I("out").value.split("\n").slice(z.length).join("\n") + "\n" + z.join("    ");
+			}
+			else if($I("out").value.length == 0 || $I("out").value[$I("out").value.length-1] == "\n") {
+				$I("out").value += z.join("    ");
+				printedLines += z.length;
+			}
+			else {
+				$I("out").value += "\n" + z.join("    ");
+				printedLines += z.length;
+			}
+		}
+		</script>
+	</head>
+	<body>
+		<textarea id="out" style="height: 90%; width: 30%; display:block; position: absolute; top: 10px; left: 10px">
+		</textarea>
+
+        <script>
+            $I("out").value = "";
+        </script>
+
+	    <script>
+
+	    </script>
+	</body>
+</html>

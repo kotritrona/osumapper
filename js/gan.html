@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+		<meta charset="utf-8" />
+		<meta name="format-detection" content="telephone=no, email=no, address=no" />
+		<title>tensorflow test</title>
+		<link rel="stylesheet" type="text/css" href="ar3.css" />
+        <script src="ar3.js" type="text/javascript"></script>
+        <!-- someone ported numpy to js!!!! -->
+        <script src="numjs.min.js" type="text/javascript"></script>
+		<script src="tf.js" type="text/javascript"></script>
+		<script>
+		var printedLines = 0;
+		function print(...z) {
+			if(printedLines > 30) {
+				$I("out").value = $I("out").value.split("\n").slice(z.length).join("\n") + "\n" + z.join("    ");
+			}
+			else if($I("out").value.length == 0 || $I("out").value[$I("out").value.length-1] == "\n") {
+				$I("out").value += z.join("    ");
+				printedLines += z.length;
+			}
+			else {
+				$I("out").value += "\n" + z.join("    ");
+				printedLines += z.length;
+			}
+		}
+		</script>
+	</head>
+	<body>
+		<textarea id="out" style="height: 90%; width: 30%; display:block; position: absolute; top: 10px; left: 10px">
+		</textarea>
+
+        <script>
+            $I("out").value = "";
+        </script>
+
+	    <script>
+            function buildRNN() {
+              var model = tf.sequential();
+
+              model.add(tf.layers.dense({units: 1, kernelInitializer: 'varianceScaling', inputShape: [1]}));
+              model.add(tf.layers.dense({units: 1, kernelInitializer: 'varianceScaling', activation: 'softmax'}));
+
+              model.compile({
+                optimizer: 'adam',
+                loss: 'meanSquaredError',
+                metrics: ['accuracy'],
+              });
+              return model;
+            }
+            function loss(predictions, labels) {
+              // Subtract our labels (actual values) from predictions, square the results,
+              // and take the mean.
+              const meanSquareError = predictions.sub(labels).square().mean();
+              return meanSquareError;
+            }
+            const learningRate = 0.5;
+            const optimizer = tf.train.sgd(learningRate);
+
+            async function train(xs, ys, numIterations = 10) {
+
+              const learningRate = 0.01;
+              const optimizer = tf.train.sgd(learningRate);
+
+              for (let iter = 0; iter < numIterations; iter++) {
+                var lossD = optimizer.minimize(() => {
+                  const predsYs = predict(xs);
+                  return loss(predsYs, ys);
+                }, true);
+                print(lossD.dataSync()[0]);
+                await tf.nextFrame();
+              }
+            }
+            function predict(x) {
+              return rnn.apply(x);
+            }
+			// const rnn = tf.layers.simpleRNN({units: 8, returnSequences: false, inputShape: [10, 10]});
+   //          const input = tf.input({shape: [10, 20]});
+   //          const output = rnn.apply(input);
+
+            async function aaz() {
+              var xData = tf.tensor2d([[0.1,0.2,0.3,0.4], [0.2,0.3,0.4,0.5], [0.3,0.2,0.1,0], [0.5,0.4,0.3,0.2]]);
+              var yData = tf.tensor2d([[1], [1], [0], [0]]);
+              const input = tf.input({shape: [4]});
+
+              // First dense layer uses relu activation.
+              const denseLayer1 = tf.layers.dense({units: 10, activation: 'relu'});
+              // Second dense layer uses softmax activation.
+              const denseLayer2 = tf.layers.dense({units: 1, activation: 'tanh'});
+
+              // Obtain the output symbolic tensor by applying the layers on the input.
+              const output = denseLayer2.apply(denseLayer1.apply(input));
+
+              // Create the model based on the inputs.
+              const model = tf.model({inputs: input, outputs: output});
+
+
+              const sgd = tf.train.sgd(0.3);
+              model.compile({optimizer: sgd, loss: 'meanSquaredError'});
+              await model.fit(xData, yData, {
+                batchSize: 1,
+                epochs: 6,
+              });
+
+              console.log(
+                  'Model weights (normalized):',
+                  model.trainableWeights[0].read().dataSync());
+              print(model.apply(xData));
+
+              const input2 = tf.input({shape: [4]});
+              var model2 = tf.model({inputs: input2, outputs: model.apply(input2)})
+              model2.compile({optimizer: sgd, loss: 'meanSquaredError'});
+              await model2.fit(xData, yData, {
+                batchSize: 1,
+                epochs: 6,
+              });
+
+              print(model2.apply(xData));
+              print(model2.predict(xData));
+            }
+            aaz();
+	    </script>
+	</body>
+</html>
