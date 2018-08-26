@@ -8,7 +8,9 @@ Progress:
 - Figure out how to import the keras model  88.3%
 - Build up a GAN using the JS version       10%
 - Port other code besides GAN to JS         25%
+- Connect the data flow                     0%
 - Draw a cute UI                            0%
+- Testing                                   0%
 - Learn react or vue or something like that ?????%
 
 ...I don't even play games in these few weekends.
