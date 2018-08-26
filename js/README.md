@@ -13,6 +13,4 @@ Progress:
 - Testing                                   0%
 - Learn react or vue or something like that ?????%
 
-...I don't even play games in these few weekends.
-
-......because alchemy is better than games.
+hmmmmmm
