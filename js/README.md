@@ -13,4 +13,4 @@ Progress:
 - Testing                                   0%
 - Learn react or vue or something like that ?????%
 
-hmmmmmm
+I should play more games
