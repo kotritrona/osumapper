@@ -269,10 +269,10 @@ def slice_wave_at(ms, sig, samplerate, size):
 def lrmix(sig):
     return (sig[:,0]+sig[:,1])/2;
 
-def get_wav_data_at(ms, sig, samplerate, size=1024, fft_size=2048, freq_low=0, freq_high=-1):
+def get_wav_data_at(ms, sig, samplerate, fft_size=2048, freq_low=0, freq_high=-1):
     if freq_high == -1:
         freq_high = samplerate//2;
-    waveslice = slice_wave_at(ms, sig, samplerate, size);
+    waveslice = slice_wave_at(ms, sig, samplerate, fft_size);
 
     # since osu! maps are usually not mapped to stereo wave, let's mix it to reduce 50% of data
     waveslice_lr = lrmix(waveslice);
@@ -290,7 +290,7 @@ def get_wav_data_at(ms, sig, samplerate, size=1024, fft_size=2048, freq_low=0, f
 
     return La, Lg;
 
-def read_wav_data(timestamps, wavfile, snapsize=[1, 2, 4, 8, 16], fft_size = 1024):
+def read_wav_data(timestamps, wavfile, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 1024):
     sig, samplerate = soundfile.read(wavfile);
     data = list();
 
@@ -303,9 +303,10 @@ def read_wav_data(timestamps, wavfile, snapsize=[1, 2, 4, 8, 16], fft_size = 102
     timestamp_interval = tmpts[1:] - tmpts[:-1];
     timestamp_interval = np.append(timestamp_interval, timestamp_interval[-1]);
 
-    for sz in snapsize:
-        data_r = np.array([get_wav_data_at(coord, sig, samplerate, size=timestamp_interval[i] * sz, fft_size=fft_size, freq_high=samplerate//4) for i, coord in enumerate(timestamps)]);
+    for sz in snapint:
+        data_r = np.array([get_wav_data_at(max(0, min(len(sig) - fft_size, coord + timestamp_interval[i] * sz)), sig, samplerate, fft_size=fft_size, freq_high=samplerate//4) for i, coord in enumerate(timestamps)]);
         data.append(data_r);
+            
 
     raw_data = np.array(data);
     norm_data = np.tile(np.expand_dims(np.mean(raw_data, axis=1), 1), (1, raw_data.shape[1], 1, 1));
@@ -328,7 +329,7 @@ def read_and_save_osu_file(path, filename = "saved"):
     osu_dict, wav_file = read_osu_file(path, convert = True);
     data, flow_data = get_map_notes(osu_dict);
     timestamps = [c[1] for c in data];
-    wav_data = read_wav_data(timestamps, wav_file, snapsize=[0.25, 0.5, 1, 2, 4, 8, 16], fft_size = 128);
+    wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);
     # in order to match first dimension
     wav_data = np.swapaxes(wav_data, 0, 1);
 
@@ -366,7 +367,7 @@ def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.j
     # timestamps = np.floor(ticks * uts["tickLength"]/4 + uts["beginTime"]);
     extra = np.array([60000 / tick_lengths, slider_lengths]);
 
-    wav_data = read_wav_data(timestamps, wav_file, snapsize=[0.25, 0.5, 1, 2, 4, 8, 16], fft_size = 128);
+    wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);
     # in order to match first dimension
     wav_data = np.swapaxes(wav_data, 0, 1);
 
@@ -376,7 +377,7 @@ def read_and_return_osu_file(path):
     osu_dict, wav_file = read_osu_file(path, convert = True);
     data, flow_data = get_map_notes(osu_dict);
     timestamps = [c[1] for c in data];
-    wav_data = read_wav_data(timestamps, wav_file, snapsize=[0.25, 0.5, 1, 2, 4, 8, 16], fft_size = 128);
+    wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);
     return data, wav_data, flow_data;
 
 # import pandas as pd;
