@@ -181,3 +181,21 @@ async function predictNotes(timestamps, channelData, divDataSource, options) {
 
   return result;
 }
+
+async function predictMomenta() {
+
+}
+
+function predictNodeDetails(preds, options) {
+  // predictedValues: isNote, isCircle, isSlider, isSpinner, isSliding, isSpinning
+
+  return {
+    isObj: isObj,
+    predictions: processedPredictions,
+    timestamps: timestamps,
+    ticks: ticks,
+    momenta: momenta,
+    sv: sv,
+    distMultiplier: distMultiplier
+  };
+}

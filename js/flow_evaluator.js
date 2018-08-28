@@ -1,7 +1,7 @@
 /*
-* @Author: Ar3sgice / @kotri_lv204
-* @Date:   Invalid Date
-*/
+ * @Author: Ar3sgice / @kotri_lv204
+ * @Date:   Invalid Date
+ */
 'use strict';
 'nope';
 'dont use strict';
@@ -16,7 +16,12 @@ glob.momentumMultiplier = 1.0;
 glob.angularMomentumMultiplier = 1.0;
 
 function readRhythmDataJSON(jsonData) {
-  var jsonObj = JSON.parse(jsonData);
+  if(typeof jsonData == "string") {
+    var jsonObj = JSON.parse(jsonData);
+  }
+  else {
+    var jsonObj = jsonData;
+  }
 
   // indices where an object is present.
   var objIndices = jsonObj.objs.map((k,i) => k == 0 ? -1 : i).filter(k => k != -1);
@@ -71,12 +76,19 @@ function getDebugData() {
  };
 }
 
-function debug() {
-  var debugData = readRhythmDataJSON(JSON.stringify(getDebugData()));
-  var debugResult = preprocessRhythmData(JSON.stringify(getDebugData()));
+async function debug() {
+  // var debugData = readRhythmDataJSON(JSON.stringify(getDebugData()));
+  // var debugResult = preprocessRhythmData(JSON.stringify(getDebugData()));
+  // window.debugData = debugData;
+  // window.debugResult = debugResult;
+  // console.log(readRhythmDataJSON(JSON.stringify(debugData)));
+
+  // we have to wait a little longer
+  var debugData = await (await fetch("evaluatedRhythm.json")).json();
+  var debugResult = preprocessRhythmData(debugData);
   window.debugData = debugData;
   window.debugResult = debugResult;
-  console.log(readRhythmDataJSON(JSON.stringify(debugData)));
+  return debugResult;
 }
 
 // close your eyes
@@ -187,12 +199,7 @@ function populateRhythmDataWithDifferences(rhythmData) {
 }
 
 function preprocessRhythmData(jsonData) {
-  if(typeof jsonData == "string") {
-    var rhythmData = readRhythmDataJSON(jsonData);
-  }
-  else {
-    var rhythmData = jsonData;
-  }
+  var rhythmData = readRhythmDataJSON(jsonData);
   glob.distMultiplier = rhythmData.distMultiplier;
 
   // "VLIW DSP"
@@ -202,66 +209,4 @@ function preprocessRhythmData(jsonData) {
   rhythmData = populateRhythmDataWithDifferences(rhythmData);
 
   return rhythmData;
-}
-
-// below should be separated into some tf_map_gan.js
-
-function loadDiscriminatorDataset(jsonData) {
-
-}
-
-function shuffleDiscriminatorDataset(discrimatorDataset) {
-
-}
-
-function constructDiscriminatorModel() {
-
-}
-
-function inblockLoss() {
-
-}
-
-function inblockTrueness() {
-
-}
-
-function cutMapChunks() {
-
-}
-
-function constructMap(varTensor, extvar) {
-
-}
-
-function polygonLoss() {
-  // nope
-}
-
-function constructMapAndCalculateLoss(varTensor, extvar) {
-
-}
-
-function constructGeneratorModel() {
-
-}
-
-function generateSet() {
-
-}
-
-function generateMap() {
-
-}
-
-function generateTest() {
-
-}
-
-function convertToOsuText() {
-
-}
-
-function convertToOsuObjectArray() {
-
 }
