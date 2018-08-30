@@ -27,4 +27,6 @@ error: computeMask is not implemented for RNN yet
 fix:   rnn.computeMask = denseLayer1.computeMask;
 ````
 
-I should play more games!
+The Tensorflow JS version has some features currently not implemented, so it uses a simplified version of the model
+
+I should test if it can get actually results close to the original one. If not, try to fix the "5D tensor problem" to use the full model instead.
