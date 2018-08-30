@@ -1,5 +1,9 @@
 Work in progress: a web interface for osumapper using tensorflow.js.
 
+It probably works now! just open connected_test.html, load mp3 in the upper file input, .osu timing in the lower file input, then press debug.
+
+Only UI left! (?)
+
 Progress:
 
 - Get TFJS working                          100%
@@ -18,12 +22,9 @@ Progress:
 
 I managed to use RNN even if computeMask is not implemented!!!
 
+````
 error: computeMask is not implemented for RNN yet
 fix:   rnn.computeMask = denseLayer1.computeMask;
+````
 
-YES
-
-and cannot support grads for less and greater
-(although it should not be differentiable at all, how did the original tf deal with this)
-
-I should play more games
+I should play more games!
