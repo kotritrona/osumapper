@@ -193,7 +193,7 @@ async function debugRhythmFromAudioBuffer(r) { // set glob.baseOsuFile
 
   print("resarray end, fetch minmax start...");
 
-  var minmax = (await (await fetch("momentum-model/extra.json")).json()).minmax;
+  var minmax = (await (await fetch("lesser-model/momentum_minmax.json")).json()).minmax;
 
   print("fetch minmax end, predict start...");
 
