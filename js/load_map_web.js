@@ -1265,6 +1265,45 @@ function cutTTD(ttd, groupSize) {
     return ttd;
 }
 
+function getBasicMapObj() {
+    return {
+        fileVersion: 14,
+        editor: "DistanceSpacing: 0.9\r\nBeatDivisor: 4\r\nGridSize: 4\r\nTimelineZoom: 2.5",
+        diff: {
+            CS: 4,
+            AR: 8,
+            SV: 1.6,
+            OD: 8,
+            HD: 6,
+            STR: 1
+        },
+        general: {
+            SampleSet: "Soft",
+            Mode: 0,
+            AudioFilename: "audio.mp3",
+            StackLeniency: 0.4,
+            AudioLeadIn: 0,
+            WidescreenStoryboard: 1,
+            PreviewTime: -1,
+            LetterboxInBreaks: 0,
+            Countdown: 0
+        },
+        color: "Combo1 : 255,166,123\r\nCombo2 : 172,189,255\r\nCombo3 : 142,255,142\r\nCombo4 : 255,255,111",
+        obj: [],
+        meta: {
+            artist: "",
+            artist2: "",
+            title: "",
+            title2: "",
+            creator: "",
+            diffname: "",
+            source: "",
+            tags: ""
+        },
+        evt: "//Background and Video events\r\n//Break Periods\r\n//Storyboard Layer 0 (Background)\r\n//Storyboard Layer 1 (Fail)\r\n//Storyboard Layer 2 (Pass)\r\n//Storyboard Layer 3 (Foreground)\r\n//Storyboard Sound Samples"
+    };
+}
+
 function main()
 {
     var args = process.argv;

@@ -28,9 +28,6 @@ if(typeof glob == 'undefined') {
     var glob = {};
 }
 
-glob.chunkSize = 10;
-glob.stepSize = 5;
-
 const dcmFeatureLength = 6;
 
 // input the preprocessed maps = flow_dataset["maps"]
@@ -41,10 +38,11 @@ function loadDiscriminatorDataset(jsonData) {
     return dcmDataset;
 }
 
-/**
+/*
  * stackoverflow#6274339
  * Shuffles array in place.
- * @param {Array} a items An array containing the items.
+ * @param      array        a items An array containing the items.
+ * @returns    itself
  */
 function shuffleArray(a) {
     var j, x, i;
@@ -57,18 +55,53 @@ function shuffleArray(a) {
     return a;
 }
 
+/*
+ * stackoverflow#6274339
+ * Shuffles two array in place at the same time.
+ * @param      [array,array]     a items An array containing the items.
+ * @returns    itself
+ */
+function shuffleTwoArrays(w) {
+    var j, x, i;
+    var [a,b] = w;
+    for (i = a.length - 1; i > 0; i--) {
+        j = Math.floor(Math.random() * (i + 1));
+        x = a[i];
+        a[i] = a[j];
+        a[j] = x;
+        x = b[i];
+        b[i] = b[j];
+        b[j] = x;
+    }
+    return [a,b];
+}
+
+/*
+ *  Shuffles the discriminator dataset.
+ */
 function shuffleDiscriminatorDataset(discrimatorDataset) {
     return shuffleArray(discrimatorDataset);
 }
 
+
+/*
+ *  Builds up the discriminator model.
+ *  @returns    dcmModel       tf.model       discriminator model
+ */
 function constructDiscriminatorModel() {
     const input = tf.input({shape: [GANParams.noteGroupSize, dcmFeatureLength]});
-    const rnn = tf.layers.conv1d({units: 32, filters: 3, kernelSize: 3}); // problem!!
-    const flat = tf.layers.flatten(); // problem!!
+    // const rnn = tf.layers.conv1d({units: 32, filters: 3, kernelSize: 3}); // problem!!
+    const rnn = tf.layers.simpleRNN({units: 32, returnSequences: false}); // problem!!
+    //const flat = tf.layers.flatten(); // problem!!
     const denseLayer1 = tf.layers.dense({units: 64, activation: 'relu'});
+
+    // when training the generator model, it will throw "computeMask for RNN is not yet implemented"
+    // since I don't know how to implement it either, we workaround with the computeMask of another layer
+    rnn.computeMask = denseLayer1.computeMask;
+
     const finalLayer = tf.layers.dense({units: 1, activation: 'tanh'});
 
-    const output = finalLayer.apply(denseLayer1.apply(flat.apply(rnn.apply(input))));
+    const output = finalLayer.apply(denseLayer1.apply(rnn.apply(input)));
     const model = tf.model({inputs: input, outputs: output});
 
     const optimizer = tf.train.adam(0.001);
@@ -96,17 +129,16 @@ function inblockTrueness(vg) {
     return tf.mean(tf.mean(wallVarL.add(wallVarR), 2), 1);
 }
 
-function cutMapChunks(c) {
+function cutMapChunks(c, chunkSize, stepSize) {
     // check if c is tensor!!! if c is tensor this needs to change slice params
     var r = [];
-    for (let i=0; i < Math.floor((c.shape[0] - glob.chunkSize) / glob.stepSize); i++) {
-        var chunk = c.slice(i * glob.stepSize, i * glob.stepSize + glob.chunkSize);
+    for (let i=0; i < Math.floor((c.shape[0] - chunkSize) / stepSize); i++) {
+        var chunk = c.slice(i * stepSize, i * stepSize + chunkSize);
         r.push(chunk);
     }
     return tf.stack(r);
 }
 
-// needs global vars noteDistances, noteAngles
 function constructMap(varTensor, extvar) {
     // var varTensor = tf.toFloat(varTensor);
     var wallL = 0.1, wallR = 0.9, wallT = 0.15, wallB = 0.85, xMax = 512, yMax = 384;
@@ -126,7 +158,7 @@ function constructMap(varTensor, extvar) {
     var batchSize = varTensor.shape[0];
 
     // tf.slice uses SIZE instead of END as second param.
-    var sliceAndBatchify = (arr, beginOffset, len) => {
+    const sliceAndBatchify = (arr, beginOffset, len) => {
         if(arr instanceof tf.Tensor) {
             var sliceEnd = len;
         }
@@ -135,14 +167,14 @@ function constructMap(varTensor, extvar) {
         }
         return tf.tile(tf.expandDims(tf.tensor(arr.slice(beginOffset, sliceEnd)), 0), [batchSize, 1]);
     };
-    var noteDistancesNow = sliceAndBatchify(glob.noteDistances, beginOffset, halfTensor).mul(lengthMultiplier);
-    var noteAnglesNow = sliceAndBatchify(glob.noteAngles, beginOffset, halfTensor);
-    var isSlider = glob.isSlider;
-    var sliderLengths = glob.sliderLengths;
-    var sliderShapes = glob.sliderShapes;
+    const noteDistancesNow = sliceAndBatchify(extvar.noteDistances, beginOffset, halfTensor).mul(lengthMultiplier);
+    const noteAnglesNow = sliceAndBatchify(extvar.noteAngles, beginOffset, halfTensor);
+    const isSlider = extvar.isSlider;
+    const sliderLengths = extvar.sliderLengths;
+    const sliderShapes = extvar.sliderShapes;
 
     // this is a global const
-    // var sliderShapeDetails = sliderShapeDetails;
+    const sliderShapeDetails = extvar.sliderShapeDetails;
 
     // init
     var l = noteDistancesNow, sl = noteDistancesNow.mul(0.7), sr = noteAnglesNow;
@@ -178,12 +210,12 @@ function constructMap(varTensor, extvar) {
         let deltaValueY = columnAt(l, k).mul(columnAt(sinList, k));
 
         // It is tensor calculation batched 8~32 each call, so if/else do not work here.
-        let wallValueL = tf.lessEqual(_px, columnAt(wallL, k));
-        let wallValueR = tf.greaterEqual(_px, columnAt(wallR, k));
-        let wallValueXMid = tf.logicalAnd(wallValueL.logicalNot(), wallValueR.logicalNot());
-        let wallValueT = tf.lessEqual(_py, columnAt(wallT, k));
-        let wallValueB = tf.greaterEqual(_py, columnAt(wallB, k));
-        let wallValueYMid = tf.logicalAnd(wallValueT.logicalNot(), wallValueB.logicalNot());
+        // let wallValueL = tf.lessEqual(_px, columnAt(wallL, k));
+        // let wallValueR = tf.greaterEqual(_px, columnAt(wallR, k));
+        // let wallValueXMid = tf.logicalAnd(wallValueL.logicalNot(), wallValueR.logicalNot());
+        // let wallValueT = tf.lessEqual(_py, columnAt(wallT, k));
+        // let wallValueB = tf.greaterEqual(_py, columnAt(wallB, k));
+        // let wallValueYMid = tf.logicalAnd(wallValueT.logicalNot(), wallValueB.logicalNot());
 
         // cannot support less and greater..
         let xDelta = deltaValueX; //tf.where(wallValueL, deltaValueX.abs(), tf.where(wallValueR, deltaValueX.abs().mul(-1), deltaValueX));
@@ -260,7 +292,6 @@ function constructGeneratorModel(inParams, outParams, lossFunc) {
 
 // needs dcmDataset!!!!!
 function getSpecialTrainBatch(size, dcmDataset) {
-    dcmDataset = dcmDataset || glob.dcmDataset;
     var out = [];
     for(let i=0; i<size; i++) {
         let rn = Math.floor(Math.random() * dcmDataset.length);
@@ -269,16 +300,33 @@ function getSpecialTrainBatch(size, dcmDataset) {
     return tf.tensor(out);
 }
 
-async function generateSet(begin, startPos, groupId, lengthMultiplier) {
+/*
+ *  Generates a group of notes.
+ *  @param   groupId           number       group # in mapData.objs
+ *  @param   startPos          number[2]    coordinate of the last object end position
+ *  @param   genvars {
+ *             mapData         object       the mapData object generated by flowEvaluator
+ *             dcmDataset      array        discriminator dataset
+ *             distMultiplier  number       distance multiplier
+ *           }
+ *  @returns groupOfNotes      tensor2d     map of shape [noteGroupSize, 6]
+ */
+async function generateSet(groupId, startPos, genvars) {
 
     var extvar = {};
 
-    extvar["begin"] = begin;
-    extvar["startPos"] = startPos;
-    extvar["lengthMultiplier"] = lengthMultiplier;
+    extvar.startPos = startPos;
+    extvar.lengthMultiplier = genvars.lengthMultiplier || (genvars.mapData && genvars.mapData.lengthMultiplier) || 1;
+
+    extvar.noteDistances = genvars.mapData.noteDistances;
+    extvar.noteAngles =    genvars.mapData.noteAngles;
+    extvar.isSlider =      genvars.mapData.isSlider;
+    extvar.sliderLengths = genvars.mapData.sliderLengths;
+    extvar.sliderShapes =  genvars.mapData.sliderShapes;
+    extvar.sliderShapeDetails = genvars.sliderShapeDetails || (typeof sliderShapeDetails == 'object' && sliderShapeDetails) || [];
 
     var dcmModel = constructDiscriminatorModel();
-    extvar["dcmModel"] = dcmModel;
+    extvar.dcmModel = dcmModel;
 
 
     // ctrl+c+v!!! hhhh
@@ -291,6 +339,8 @@ async function generateSet(begin, startPos, groupId, lengthMultiplier) {
     const gInputSize = GANParams["gInputSize"];
     const cTrueBatch = GANParams["cTrueBatch"]
     const cFalseBatch = GANParams["cFalseBatch"]
+
+    extvar.begin = groupId * noteGroupSize;
 
     const plotNoise = tf.randomNormal([2, gInputSize]);
 
@@ -314,7 +364,7 @@ async function generateSet(begin, startPos, groupId, lengthMultiplier) {
         var newFalseMaps = constructMap(predictedMapsData, extvar);
         var newFalseLabels = tf.zeros([cFalseBatch]);
 
-        var specialTrainBatch = getSpecialTrainBatch(cTrueBatch);
+        var specialTrainBatch = getSpecialTrainBatch(cTrueBatch, genvars.dcmDataset);
         var specialTrainLabelBatch = tf.ones([cTrueBatch]);
 
         var actualTrainData = tf.concat([newFalseMaps, specialTrainBatch], 0);
@@ -342,34 +392,65 @@ async function generateSet(begin, startPos, groupId, lengthMultiplier) {
         }
     }
 
-    return currentMap;
+    window.cm1 = currentMap;
+    return currentMap.slice([0, 0, 0], [1, -1, -1]).squeeze([0]);
 }
 
-function generateMap() {
+/*
+ *  Generates a all group of notes in a map.
+ *  @param    mapData           object       the mapData object generated by flowEvaluator
+ *  @param    dcmDataset        array        discriminator dataset
+ *  @param    generateLimit     number       max. groups to generate (optional)
+ *  @returns  mapset            array        map as 2d array of shape [any, 6]
+ */
+async function generateMap(mapData, dcmDataset, generateLimit) {
     var o = [];
-    var noteGroupSize = GANParams["noteGroupSize"];
-    var timestamps = glob.timestamps;
+    var timestamps = mapData.timestamps;
+    const noteGroupSize = GANParams["noteGroupSize"];
+    var generateLimit = generateLimit || Math.floor(timestamps.length / noteGroupSize);
+    var genvars = {
+        mapData: mapData,
+        dcmDataset: dcmDataset,
+        lengthMultiplier: mapData.distMultiplier
+    };
+
     var pos = [Math.floor(Math.random() * 312 + 100), Math.floor(Math.random() * 304 + 80)];
-    for(let i=0; i<Math.floor(timestamps.length / noteGroupSize); i++) {
-        let z = generateSet(i * noteGroupSize, pos, i, glob.distMultiplier).mul(tf.tensor1d([512, 384, 1, 1, 512, 384]));
-        pos = z.slice([z.shape[0] - 1, 0], [1, 2]).dataSync()[0];
+    for(let i=0; i<generateLimit; i++) {
+        let z = (await generateSet(i, pos, genvars)).mul(tf.tensor1d([512, 384, 1, 1, 512, 384]));
+        pos = Array.from(z.slice([z.shape[0] - 1, 0], [1, 2]).dataSync()).map(f => Math.floor(f));
         o.push(z);
     }
-    a = tf.concat(o);
-    return a.dataSync();
+    window.o = o;
+    return reshapeMapData(await tf.concat(o).data());
 }
 
+
+/*
+ *  Reshapes generated mapData to [noteCount, dcmFeatureLength = 6]
+ *  @param    data              mapData generated by tf.Tensor#data()
+ *  @returns  data              array[*][dcmFeatureLength]
+ */
+function reshapeMapData(data) {
+    var a = Array.from(data), out = [];
+    for(let i=0; i<a.length; i+=dcmFeatureLength) {
+        out.push(a.slice(i, i + dcmFeatureLength));
+    }
+    return out;
+}
+
+/*
+ *  Unused because I made map_gan not to use global-scope map data
+ */
 function loadToGlobalScope(mapData) {
     const keyArray = ["objs","predictions","momenta","ticks","timestamps","sv","isSlider","isSpinner","isSliding","isSpinning","sliderTicks","sliderShapes","sliderLengthBase","sliderLengths","timestampsPlus1","timestampsAfter","timestampsBefore","noteDistances","noteAngles"];
     keyArray.forEach(key => glob[key] = mapData[key]);
 }
 
-async function debug2() {
+async function debugMapGAN(mapData) {
     print("Debug start!!");
     var dcmDataset = loadDiscriminatorDataset(await (await fetch("dcm_dataset_full.json")).text());
-    glob.dcmDataset = dcmDataset;
-    var mapData = await debug();
-    loadToGlobalScope(mapData);
+    print("Discriminator dataset loaded!!");
+    var mapData = mapData || await debugFlowEvaluator();
     print("MapData loaded!!");
 
     // var extvar = {begin: 30, startPos: [111, 222], lengthMultiplier: 1}
@@ -384,20 +465,74 @@ async function debug2() {
     // window.mpd = mapped;
     // print(mapped);
 
-    var noteGroupSize = GANParams["noteGroupSize"];
-    var cm = await generateSet(3 * noteGroupSize, [117, 106], 3,  glob.distMultiplier);
+    var cm = window.cm = await generateMap(mapData, dcmDataset);
     print("Map Generated!!");
-    print(cm);
+
+    await new Promise(res => setTimeout(res, 100));
+    var dm = window.dm = convertToHitObjectArray(cm, mapData);
+    print("Map Converted!!");
+
+    await new Promise(res => setTimeout(res, 100));
+    var baseMapObj = glob.baseMap;
+    var mapified = window.mapified = mapify(dm, "Various Artists", glob.musicFilename, baseMapObj);
+    print("Mapified!!");
+    return mapified;
 }
 
+/*
+ *  Generate a group of debugging notes and plot them
+ */
 function generateTest() {
-
+    // TODO
 }
 
-function convertToOsuText() {
-
+/*
+ *  convert mapData returned by generateMap to hitObjectArray
+ */
+function convertToHitObjectArray(objArray, mapData) {
+    const convToCircle = (arr, i) => ({
+        "x": Math.round(arr[0]),
+        "y": Math.round(arr[1]),
+        "type": 1,
+        "time": Math.round(mapData.timestamps[i]),
+        "hitsounds": 0,
+        "extHitsounds": "0:0:0",
+        "index": i
+    });
+    const convToSlider = (arr, i) => ({
+        "x": Math.round(arr[0]),
+        "y": Math.round(arr[1]),
+        "type": 2,
+        "time": Math.round(mapData.timestamps[i]),
+        "hitsounds": 0,
+        "extHitsounds": "0:0:0",
+        "sliderGenerator": {
+            "type": parseInt(mapData.sliderShapes[i]),
+            "dOut": [arr[2], arr[3]],
+            "len": mapData.sliderLengthBase[i] * mapData.sliderTicks[i],
+            "ticks": mapData.sliderTicks[i],
+            "endpoint": [Math.round(arr[4]), Math.round(arr[5])]
+        },
+        "index": i
+    });
+    var output = objArray.map((arr, i) => mapData.isSlider[i] ? convToSlider(arr, i) : convToCircle(arr, i));
+    return output;
 }
 
-function convertToOsuObjectArray() {
+function mapify(hitObjectArray, artist, title, baseMapObj) {
+    baseMapObj.obj = hitObjectArray;
+    globalizeMap(baseMapObj);
 
+    generateSliders(baseMapObj);
+    hitObjectArray = streamRegularizer(hitObjectArray);
+    hitObjectArray = newComboEvery2Metronome(hitObjectArray, baseMapObj.timing.uts);
+
+    hitObjectArray = makeClaps(11, hitObjectArray);
+    hitObjectArray = makeClaps(1, hitObjectArray);
+
+    baseMapObj.meta.artist = baseMapObj.meta.artist2 = artist;
+    baseMapObj.meta.title = baseMapObj.meta.title2 = title;
+    baseMapObj.meta.creator = "osumapper";
+
+    return baseMapObj;
 }

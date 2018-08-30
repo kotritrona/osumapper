@@ -76,7 +76,7 @@ function getDebugData() {
  };
 }
 
-async function debug() {
+async function debugFlowEvaluator(evaluatedRhythm) {
   // var debugData = readRhythmDataJSON(JSON.stringify(getDebugData()));
   // var debugResult = preprocessRhythmData(JSON.stringify(getDebugData()));
   // window.debugData = debugData;
@@ -84,10 +84,13 @@ async function debug() {
   // console.log(readRhythmDataJSON(JSON.stringify(debugData)));
 
   // we have to wait a little longer
-  var debugData = await (await fetch("evaluatedRhythm.json")).json();
+  print("begin debugging flowEvaluator");
+  var debugData = evaluatedRhythm || await (await fetch("evaluatedRhythm.json")).json();
+  // var debugData = await debugRhythmPredictor();
   var debugResult = preprocessRhythmData(debugData);
-  window.debugData = debugData;
-  window.debugResult = debugResult;
+  print("flowEvaluator done");
+  window.flowEvaluatorData = debugData;
+  window.flowEvaluatorResult = debugResult;
   return debugResult;
 }
 
