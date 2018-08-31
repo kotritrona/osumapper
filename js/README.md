@@ -20,12 +20,6 @@ Progress:
 - Become cute                               0%
 - Testing                                   25%
 
-I managed to use RNN even if computeMask is not implemented!!!
-
-````
-error: computeMask is not implemented for RNN yet
-fix:   rnn.computeMask = denseLayer1.computeMask;
-````
 
 The Tensorflow JS version has some features currently not implemented, so it uses a simplified version of the model
 
