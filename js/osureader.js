@@ -154,8 +154,8 @@ function predictNoteDetails(predsAndMomenta, divData, options) {
   // ????? how does it even got negative!!! must research this later!!!
   // todo!!!
   momenta = momenta.map(d => {
-    d[0] = Math.abs((d[0] + 1) / 2 / 0.8 * (momentumMinMax[0][0] - momentumMinMax[1][0]) + momentumMinMax[1][0]);
-    d[1] = (d[1] + 1) / 2 / 0.8 * (momentumMinMax[0][1] - momentumMinMax[1][1]) + momentumMinMax[1][1];
+    d[0] = Math.abs((d[0] + 1) / 2 / 0.8 * (momentumMinMax.max[0] - momentumMinMax.min[0]) + momentumMinMax.min[0]);
+    d[1] = (d[1] + 1) / 2 / 0.8 * (momentumMinMax.max[1] - momentumMinMax.min[1]) + momentumMinMax.min[1];
     return d;
   })
 
@@ -193,7 +193,7 @@ async function debugRhythmFromAudioBuffer(r) { // set glob.baseOsuFile
 
   print("resarray end, fetch minmax start...");
 
-  var minmax = (await (await fetch("lesser-model/momentum_minmax.json")).json()).minmax;
+  var minmax = await (await fetch("lesser-model/momentum_minmax.json")).json();
 
   print("fetch minmax end, predict start...");
 
@@ -204,7 +204,7 @@ async function debugRhythmFromAudioBuffer(r) { // set glob.baseOsuFile
           timestamps: timestamps,
           ticks: ticks,
           momentumMinMax: minmax,
-          distMultiplier: 1,
+          distMultiplier: 0.7,
           sliderFavor: 0,
           divisorFavor: [0, 0, 0, 0],
           noteDensity: 0.4

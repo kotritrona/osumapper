@@ -15,10 +15,11 @@ if(typeof GANParams == 'undefined') {
         "goodEpoch" : 6,
         "maxEpoch" : 25,
         "noteGroupSize" : 10,
+        "dcmDatasetSlice" : 5,
         "gEpochs" : 7,
         "cEpochs" : 1,
-        "gBatch" : 50,
-        "gInputSize" : 50,
+        "gBatch" : 12,
+        "gInputSize" : 40,
         "cTrueBatch" : 10,
         "cFalseBatch" : 10
     };
@@ -35,6 +36,19 @@ const dcmFeatureLength = 6;
 // they are all in (10,6)s anyways
 function loadDiscriminatorDataset(jsonData) {
     var dcmDataset = JSON.parse(jsonData);
+    return dcmDataset;
+}
+
+function loadDiscriminatorDatasetFromUnsliced(jsonData) {
+    var dcmDataset = [];
+    const xMax = 512, yMax = 384;
+    for(let map of jsonData) {
+        map = map.map(map => [map[0] / xMax, map[1] / yMax, map[2], map[3], map[4] / xMax, map[5] / yMax]);
+        let maxI = Math.floor((map.length - GANParams.noteGroupSize) / GANParams.dcmDatasetSlice);
+        for(let i=0; i<maxI; i ++) {
+            dcmDataset.push(map.slice(i * GANParams.dcmDatasetSlice, i * GANParams.dcmDatasetSlice + GANParams.noteGroupSize));
+        }
+    }
     return dcmDataset;
 }
 
@@ -353,13 +367,6 @@ async function generateSet(groupId, startPos, genvars) {
         let gNoise = tf.randomNormal([gBatch, gInputSize]);
         let gLabel = tf.ones([gBatch, noteGroupSize * 4]);
 
-        dcmModel.trainable = false;
-        var hist1 = await gModel.fit(gNoise, gLabel, {
-            epochs: gEpochs,
-            validationSplit: 0.2 // like dropout here, not real validation
-
-        });
-
         var predictedMapsData = gModel.predict(tf.randomNormal([cFalseBatch, gInputSize]));
         var newFalseMaps = constructMap(predictedMapsData, extvar);
         var newFalseLabels = tf.zeros([cFalseBatch]);
@@ -374,6 +381,14 @@ async function generateSet(groupId, startPos, genvars) {
         var hist2 = await dcmModel.fit(actualTrainData, actualTrainLabels, {
             epochs: cEpochs,
             validationSplit: 0.2
+        });
+
+        // train generator last
+        dcmModel.trainable = false;
+        var hist1 = await gModel.fit(gNoise, gLabel, {
+            epochs: gEpochs,
+            validationSplit: 0.2 // like dropout here, not real validation
+
         });
 
         var genLoss = tf.mean(hist1.history['loss']).dataSync()[0];
@@ -448,7 +463,7 @@ function loadToGlobalScope(mapData) {
 
 async function debugMapGAN(mapData) {
     print("Debug start!!");
-    var dcmDataset = loadDiscriminatorDataset(await (await fetch("dcm_dataset_full.json")).text());
+    var dcmDataset = loadDiscriminatorDatasetFromUnsliced(await (await fetch("mapset.json")).json());
     print("Discriminator dataset loaded!!");
     var mapData = mapData || await debugFlowEvaluator();
     print("MapData loaded!!");
@@ -474,7 +489,7 @@ async function debugMapGAN(mapData) {
 
     await new Promise(res => setTimeout(res, 100));
     var baseMapObj = glob.baseMap;
-    var mapified = window.mapified = mapify(dm, "Various Artists", glob.musicFilename, baseMapObj);
+    var mapified = window.mapified = mapify(dm, baseMapObj); //"Various Artists", glob.musicFilename
     print("Mapified!!");
     return mapified;
 }
@@ -519,7 +534,7 @@ function convertToHitObjectArray(objArray, mapData) {
     return output;
 }
 
-function mapify(hitObjectArray, artist, title, baseMapObj) {
+function mapify(hitObjectArray, baseMapObj, artist, title) {
     baseMapObj.obj = hitObjectArray;
     globalizeMap(baseMapObj);
 
@@ -530,9 +545,11 @@ function mapify(hitObjectArray, artist, title, baseMapObj) {
     hitObjectArray = makeClaps(11, hitObjectArray);
     hitObjectArray = makeClaps(1, hitObjectArray);
 
-    baseMapObj.meta.artist = baseMapObj.meta.artist2 = artist;
-    baseMapObj.meta.title = baseMapObj.meta.title2 = title;
-    baseMapObj.meta.creator = "osumapper";
+    if(artist && title) {
+        baseMapObj.meta.artist = baseMapObj.meta.artist2 = artist;
+        baseMapObj.meta.title = baseMapObj.meta.title2 = title;
+        baseMapObj.meta.creator = "osumapper";
+    }
 
     return baseMapObj;
 }
