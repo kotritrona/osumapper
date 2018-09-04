@@ -4,6 +4,10 @@ It probably works now! just open connected_test.html, load mp3 in the upper file
 
 Only UI left! (?)
 
+Edit: I found a problem that this cannot perform as well as the original!
+
+... maybe because of network structure. try to optimize it
+
 Progress:
 
 - Get TFJS working                          100%
