@@ -354,6 +354,43 @@ def read_and_save_osu_file(path, filename = "saved"):
     # pd.DataFrame(flow_data).to_csv("flow.csv", header=["TICK", "TIME", "TYPE", "X", "Y", "IN_DX", "IN_DY", "OUT_DX", "OUT_DY"]);
 
     np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
+    
+def read_and_save_timestamps(path, filename = "saved"):
+    osu_dict, wav_file = read_osu_file(path, convert = True);
+    data, flow_data = get_map_notes(osu_dict);
+    timestamps = [c[1] for c in data];
+    with open(filename + "_ts.json", "w") as json_file:
+        json.dump(np.array(timestamps).tolist(), json_file);
+        
+def read_and_save_osu_file_using_json_wavdata(path, json_path, filename = "saved"):
+    osu_dict, wav_file = read_osu_file(path, convert = True);
+    data, flow_data = get_map_notes(osu_dict);
+    with open(json_path) as wav_json:
+        wav_data = json.load(wav_json)
+    # in order to match first dimension
+    # wav_data = np.swapaxes(wav_data, 0, 1);
+
+    # change the representation of note_type
+    # a bit of copypaste code because I changed the data structure many times here
+    transformed_data = [];
+    for d in data:
+        if d[3] == 1:
+            transformed_data.append([d[0], d[1], d[2], 1, 0, 0, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
+        elif d[3] == 2:
+            transformed_data.append([d[0], d[1], d[2], 0, 1, 0, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
+        elif d[3] == 3:
+            transformed_data.append([d[0], d[1], d[2], 0, 0, 1, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
+        elif d[3] == 4:
+            transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 1, 0, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
+        elif d[3] == 5:
+            transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 0, 1, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
+        else:
+            transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9], d[10]]);
+
+    # import pandas as pd;
+    # pd.DataFrame(flow_data).to_csv("flow.csv", header=["TICK", "TIME", "TYPE", "X", "Y", "IN_DX", "IN_DY", "OUT_DX", "OUT_DY"]);
+
+    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
 
 def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.json"):
     osu_dict, wav_file = read_osu_file(path, convert = True, json_name=json_name);
