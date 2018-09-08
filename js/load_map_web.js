@@ -1230,8 +1230,8 @@ function getAllDivData(timeEnd, divisor) {
     var ticks = [];
     var timestamps = [];
     var tick = 0;
-    var convertBPM = bpm => bpm / 120 - 1;
     var convertTL = tl => tl / 500 - 1;
+    var convertBPM = bpm => bpm / 120 - 1;
     var convertSV = sv => sv / 150 - 1;
 
     for(let i=0; i<uts.length; i++) {
@@ -1241,8 +1241,8 @@ function getAllDivData(timeEnd, divisor) {
             let wl = (tick - beginTick) % divisor;
             out.push([
                 +(wl == 0), +(wl == 1), +(wl == 2), +(wl == 3),
-                convertBPM(60000 / uts[i].tickLength),
                 convertTL(uts[i].tickLength),
+                convertBPM(60000 / uts[i].tickLength),
                 convertSV(getSliderLen(timestamp))
             ]);
             ticks.push(tick);

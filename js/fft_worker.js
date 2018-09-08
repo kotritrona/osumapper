@@ -114,6 +114,14 @@ function getWaveDataAt(ms, sig, sampleRate, fftSize, options) {
   var wavSlice = sliceWaveAt(ms, sig, sampleRate, fftSize);
 
   var fftResult = getFreqs(wavSlice, fftSize);
+
+  // somehow Web Audio upsamples 44.1k mp3s to 48k.
+  // Idk how this could be done (it's a waste of time doing this...), but it is apparently making a negative effect
+  // so let's downsample it back
+  // if(sampleRate == 48000) {
+  //   fftResult.amp = freqs48kTo44_1k(fftResult.amp);
+  //   fftResult.phase = freqs48kTo44_1k(fftResult.phase);
+  // }
   fftResult.amp = fftResult.amp.slice(Math.floor(fftSize * freqLow/sampleRate), Math.floor(fftSize * freqHigh/sampleRate));
   fftResult.phase = fftResult.phase.slice(Math.floor(fftSize * freqLow/sampleRate), Math.floor(fftSize * freqHigh/sampleRate));
 
@@ -138,27 +146,38 @@ function readWavData(timestamps, sig, sampleRate, fftSize, snapInterval) {
   var normalizedSig = sig.map(a => a / sigMax);
 
   // Modify the phase variance
-  const phaseStd = Math.PI / Math.sqrt(3);
+  // const phaseStd = Math.PI / Math.sqrt(3);
 
   var timestampInterval = timestamps.slice(1).map((d,k) => d - timestamps[k]);
   timestampInterval = timestampInterval.concat(timestampInterval[timestampInterval.length-1]);
 
   var data = [];
   for(let sz of snapInterval) {
-    let currentAmps = [];
+    var currentAmps = [];
     var dataR = timestamps.map((coord, i) => {
       var fftResult = getWaveDataAt(Math.max(0, Math.min(sig.length - fftSize, coord + timestampInterval[i] * sz)), sig, sampleRate, fftSize, {
         freqHigh: Math.floor(sampleRate/4)
       });
+      // fftResult.amp shape: [fftSize]
       currentAmps.push(fftResult.amp);
       return fftResult;
     });
-    var mean = nj.mean(currentAmps);
-    var std = nj.std(currentAmps);
-    data.push(dataR.map(d => [d.amp.map(amp => (amp - mean) / std), d.phase.map(phase => phase / phaseStd)]));
-  }
+    // currentAmps shape: [timestamps.length, fftSize]
+    var mean = nj.transpose(currentAmps, [1,0]).tolist().map(d => nj.mean(d));
+    var std = nj.transpose(currentAmps, [1,0]).tolist().map(d => nj.std(d));
+    // console.log(mean);
+    // console.log(std);
+    // console.log(currentAmps[0]);
 
-  return nj.array(data).transpose([1,0,3,2]).tolist();
+    // data.push(dataR.map(d => [d.amp.map(amp => (amp - mean) / std), d.phase.map(phase => phase / phaseStd)]));
+    data.push(dataR.map(d => d.amp.map((amp, c) => (amp - mean[c]) / std[c])));
+  }
+  // data shape: [snapInterval, timestamps.length, fftSize]
+
+
+  // return nj.array(data).transpose([1,0,3,2]).tolist();
+  // return shape: [timestamps.length, fftSize, snapInterval]
+  return nj.array(data).transpose([1,2,0]).tolist();
 }
 
 function message() {

@@ -155,7 +155,8 @@ function cutMapChunks(c, chunkSize, stepSize) {
 
 function constructMap(varTensor, extvar) {
     // var varTensor = tf.toFloat(varTensor);
-    var wallL = 0.1, wallR = 0.9, wallT = 0.15, wallB = 0.85, xMax = 512, yMax = 384;
+    // var wallL = 0.1, wallR = 0.9, wallT = 0.15, wallB = 0.85, xMax = 512, yMax = 384;
+    var xMax = 512, yMax = 384;
     var out = [];
     var cp = tf.tensor1d([256, 192, 0, 0]);
     var phase = 0;
@@ -199,10 +200,10 @@ function constructMap(varTensor, extvar) {
     cosList = cosList.div(lenList);
     sinList = sinList.div(lenList);
 
-    wallL = tf.add(0.05 * xMax, l.mul(0.5));
-    wallR = tf.add(0.05 * xMax, l.mul(-0.5));
-    wallT = tf.add(0.05 * yMax, l.mul(0.5));
-    wallB = tf.add(0.05 * yMax, l.mul(-0.5));
+    // wallL = tf.add(0.05 * xMax, l.mul(0.5));
+    // wallR = tf.add(0.05 * xMax, l.mul(-0.5));
+    // wallT = tf.add(0.05 * yMax, l.mul(0.5));
+    // wallB = tf.add(0.05 * yMax, l.mul(-0.5));
     var rerand = tf.greater(l, yMax / 2);
     var notRerand = tf.lessEqual(l, yMax / 2);
 
@@ -270,6 +271,163 @@ function constructMap(varTensor, extvar) {
         _pa = _pa % 6.283; // I think this line is useless.
     }
     return tf.transpose(tf.stack(out, 0), [1, 0, 2]);
+}
+
+
+function constructMapNonGAN(extvar) {
+    // var varTensor = tf.toFloat(varTensor);
+    // var wallL = 0.1, wallR = 0.9, wallT = 0.15, wallB = 0.85, xMax = 512, yMax = 384;
+    var xMax = 512, yMax = 384;
+    var out = [];
+    var cp = null;
+
+    // length multiplier
+    const lengthMultiplier = extvar.lengthMultiplier || 1;
+
+    // notedists
+    const beginOffset = extvar.begin || 0;
+
+    // IMPORTANT
+    const mapLen = extvar.mapLen;
+    const noteDistancesNow = extvar.noteDistances.slice(beginOffset, beginOffset + mapLen).map(k => k * lengthMultiplier);
+    const noteAnglesNow = extvar.noteAngles.slice(beginOffset, beginOffset + mapLen);
+    const isSlider = extvar.isSlider;
+    const sliderLengths = extvar.sliderLengths;
+    const sliderShapes = extvar.sliderShapes;
+
+    // IMPORTANT
+    const timestamps = extvar.timestamps;
+
+    // this is a global const
+    const sliderShapeDetails = extvar.sliderShapeDetails;
+
+    // init
+    var l = noteDistancesNow, sr = noteAnglesNow;
+
+    var rerand = l.map(k => k >= yMax / 2);
+    var notRerand = false;
+
+    const rn = k => !k ? Math.random() : Math.floor(Math.random() * k);
+    const ra = () => {
+        let a = Math.random() * Math.PI * 2;
+        return [Math.cos(a), Math.sin(a)];
+    };
+    const inBorder = (x,y) => 0<x && x<xMax && 0<y && y<yMax;
+    const distSq = (a,b,x,y) => (a-x)**2 + (b-y)**2;
+    const noCollision = (x,y) => collisions.every(c => distSq(c[0], c[1], x, y) > collisionDistSq);
+
+    var collisions = [], collisionDist = extvar.collisionDistance || 40;
+    var collisionDistSq = collisionDist **2, maxCollisionTime = extvar.collisionTime || 3000;
+    const removeOldCollision = noteIndex => collisions = collisions.filter(c => timestamps[c[2]] >= timestamps[noteIndex] - maxCollisionTime);
+    const addCollision = (x, y, noteIndex) => {
+        collisions.push([x,y,noteIndex]);
+        removeOldCollision(noteIndex);
+    };
+    const addCollisionSlider = (x1, y1, x2, y2, noteIndex) => {
+        const maxInterpCount = 5;
+        for(let i=0; i<=maxInterpCount; i++) {
+            let x = (x2-x1) * (i / maxInterpCount) + x1;
+            let y = (y2-y1) * (i / maxInterpCount) + y1;
+            collisions.push([x,y,noteIndex]);
+        }
+        removeOldCollision(noteIndex);
+    };
+
+    // generate
+    var [_px, _py] = extvar.startPos || [256, 192];
+    var _pa = 0;
+    // this is not important since the first position starts at _ppos + Δpos
+    var _x = 256, _y = 192;
+
+    for(let k=0; k < mapLen; k++) {
+        let noteIndex = beginOffset + k;
+
+        var iterCount = 0;
+
+        while(true && true) {
+            if(iterCount > 100) {
+                _x = rn(xMax);
+                _y = rn(yMax);
+                break;
+            }
+            else if(rerand[k]) {
+                _x = rn(xMax);
+                _y = rn(yMax);
+            }
+            else {
+                let [xDelta, yDelta] = ra().map(a => a * l[k]);
+                _x = _px + xDelta;
+                _y = _py + yDelta;
+            }
+
+            iterCount++;
+
+            let ib = inBorder(_x, _y);
+            if(ib && iterCount > 50) {
+                break;
+            }
+            if(ib && l[k] < collisionDist) {
+                break;
+            }
+            let nc = noCollision(_x, _y);
+            if(ib && nc) {
+                break;
+            }
+        }
+
+        if(isSlider[noteIndex]) {
+            let sln = sliderLengths[noteIndex];
+            let sliderShape = sliderShapes[noteIndex];
+            let sCos = sliderShapeDetails[sliderShape].cos;
+            let sSin = sliderShapeDetails[sliderShape].sin;
+
+            let _a;
+            let _b;
+
+            var iterSlider = 0;
+
+            while(!false && true || false ^ !true) {
+                [_a, _b] = ra();
+                let [xSlided, ySlided] = [_a, _b].map(a => a * sln);
+                _px = _x + xSlided;
+                _py = _y + ySlided;
+                iterSlider++;
+
+                if(iterSlider > 100) {
+                    break;
+                }
+                let ib = inBorder(_px, _py);
+                if(ib && iterSlider > 50) {
+                    break;
+                }
+                let nc = noCollision(_px, _py);
+                if(ib && nc) {
+                    break;
+                }
+            }
+
+            addCollisionSlider(_x, _y, _px, _py, noteIndex);
+
+            // cos(a+θ) = cosa cosθ - sina sinθ
+            // sin(a+θ) = cosa sinθ + sina cosθ
+            let _oa = _a * sCos - _b * sSin;
+            let _ob = _a * sSin + _b * sCos;
+
+            cp = [_x / xMax, _y / yMax, _oa, _ob, _px / xMax, _py / yMax];
+            out.push(cp);
+        }
+        else {
+            let [_a, _b] = ra();
+            _px = _x;
+            _py = _y;
+
+            addCollision(_x, _y, noteIndex);
+
+            cp = [_x / xMax, _y / yMax, _a, _b, _px / xMax, _py / yMax];
+            out.push(cp);
+        }
+    }
+    return out;
 }
 
 function polygonLoss() {
@@ -435,8 +593,45 @@ async function generateMap(mapData, dcmDataset, generateLimit) {
         pos = Array.from(z.slice([z.shape[0] - 1, 0], [1, 2]).dataSync()).map(f => Math.floor(f));
         o.push(z);
     }
-    window.o = o;
     return reshapeMapData(await tf.concat(o).data());
+}
+
+/*
+ *  hmm
+ */
+async function generateMapNonGAN(mapData, generateLimit) {
+    const xMax = 512, yMax = 384;
+
+    var timestamps = mapData.timestamps;
+    const noteGroupSize = GANParams["noteGroupSize"];
+    var generateLimit = generateLimit || Math.floor(timestamps.length);
+    var extvars = {
+        startPos: [Math.floor(Math.random() * 312 + 100), Math.floor(Math.random() * 304 + 80)],
+        begin: 0,
+        lengthMultiplier: mapData.distMultiplier,
+        noteDistances: mapData.noteDistances,
+        noteAngles: mapData.noteAngles,
+        isSlider: mapData.isSlider,
+        sliderLengths: mapData.sliderLengths,
+        sliderShapes: mapData.sliderShapes,
+        timestamps: timestamps,
+        mapLen: generateLimit,
+        sliderShapeDetails: sliderShapeDetails,
+        collisionDistance: 50,
+        collisionTime: 2400
+    };
+
+    var constructed = constructMapNonGAN(extvars);
+    var final = constructed.map(a => [
+        Math.floor(a[0] * xMax),
+        Math.floor(a[1] * yMax),
+        a[2],
+        a[3],
+        Math.floor(a[4] * xMax),
+        Math.floor(a[5] * yMax)
+    ]);
+
+    return window.o = final;
 }
 
 
@@ -480,7 +675,8 @@ async function debugMapGAN(mapData) {
     // window.mpd = mapped;
     // print(mapped);
 
-    var cm = window.cm = await generateMap(mapData, dcmDataset);
+    // var cm = window.cm = await generateMap(mapData, dcmDataset);
+    var cm = window.cm = await generateMapNonGAN(mapData);
     print("Map Generated!!");
 
     await new Promise(res => setTimeout(res, 100));
