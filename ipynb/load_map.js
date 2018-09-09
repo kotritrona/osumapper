@@ -66,7 +66,7 @@ function reparseGeneral(obj) {
     var o = "";
     for(let key in obj) {
         var value = obj[key];
-        o += key + ": " + value + "\n";
+        o += key + ": " + value + "\r\n";
     }
     return o.trim();
 }
@@ -1176,6 +1176,7 @@ function generateSlider(slider) {
         sliderLength: g.len,
         sliderReverses: st.repeats
     });
+    slider.sliderPoints = _rsp;
 
     // delete the generator
     delete slider.sliderGenerator;

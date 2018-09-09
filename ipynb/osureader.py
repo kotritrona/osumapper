@@ -84,12 +84,12 @@ def get_end_time(note):
         return note["time"];
 
 # edited from uts to ts wwww
-def get_all_ticks_and_lengths_from_ts(uts_array, ts_array, end_time):
+def get_all_ticks_and_lengths_from_ts(uts_array, ts_array, end_time, divisor=4):
     # Returns array of all timestamps, ticklens and sliderlens.
     endtimes = ([uts["beginTime"] for uts in uts_array] + [end_time])[1:];
-    ticks = [np.arange(uts["beginTime"], endtimes[i], uts["tickLength"] / 4) for i, uts in enumerate(uts_array)];
-    tick_len = [[uts["tickLength"]] * len(np.arange(uts["beginTime"], endtimes[i], uts["tickLength"] / 4)) for i, uts in enumerate(uts_array)];
-    # slider_len = [[ts["sliderLength"]] * len(np.arange(ts["beginTime"], endtimes[i], ts["tickLength"] / 4)) for i, ts in enumerate(ts_array)];
+    ticks = [np.arange(uts["beginTime"], endtimes[i], uts["tickLength"] / divisor) for i, uts in enumerate(uts_array)];
+    tick_len = [[uts["tickLength"]] * len(np.arange(uts["beginTime"], endtimes[i], uts["tickLength"] / divisor)) for i, uts in enumerate(uts_array)];
+    # slider_len = [[ts["sliderLength"]] * len(np.arange(ts["beginTime"], endtimes[i], ts["tickLength"] / divisor)) for i, ts in enumerate(ts_array)];
     slider_len = [get_slider_len_ts(ts_array, tick) for tick in np.concatenate(ticks)];
     return np.round(np.concatenate(ticks)).astype(int), np.concatenate(tick_len), np.array(slider_len);
 
@@ -325,9 +325,9 @@ def read_wav_data(timestamps, wavfile, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0
 # MAPTICKS = (Total map time + 3000) / tickLength / (divisor = 4) - EMPTY_TICKS
 # EMPTY_TICKS = ticks where no note around in 5 secs
 #
-def read_and_save_osu_file(path, filename = "saved"):
+def read_and_save_osu_file(path, filename = "saved", divisor=4):
     osu_dict, wav_file = read_osu_file(path, convert = True);
-    data, flow_data = get_map_notes(osu_dict);
+    data, flow_data = get_map_notes(osu_dict, divisor=divisor);
     timestamps = [c[1] for c in data];
     wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);
     # in order to match first dimension
@@ -355,16 +355,16 @@ def read_and_save_osu_file(path, filename = "saved"):
 
     np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
     
-def read_and_save_timestamps(path, filename = "saved"):
+def read_and_save_timestamps(path, filename = "saved", divisor=4):
     osu_dict, wav_file = read_osu_file(path, convert = True);
-    data, flow_data = get_map_notes(osu_dict);
+    data, flow_data = get_map_notes(osu_dict, divisor=divisor);
     timestamps = [c[1] for c in data];
     with open(filename + "_ts.json", "w") as json_file:
         json.dump(np.array(timestamps).tolist(), json_file);
         
-def read_and_save_osu_file_using_json_wavdata(path, json_path, filename = "saved"):
+def read_and_save_osu_file_using_json_wavdata(path, json_path, filename = "saved", divisor=4):
     osu_dict, wav_file = read_osu_file(path, convert = True);
-    data, flow_data = get_map_notes(osu_dict);
+    data, flow_data = get_map_notes(osu_dict, divisor=divisor);
     with open(json_path) as wav_json:
         wav_data = json.load(wav_json)
     # in order to match first dimension
@@ -392,12 +392,12 @@ def read_and_save_osu_file_using_json_wavdata(path, json_path, filename = "saved
 
     np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
 
-def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.json"):
+def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.json", divisor=4):
     osu_dict, wav_file = read_osu_file(path, convert = True, json_name=json_name);
     sig, samplerate = soundfile.read(wav_file);
     file_len = (sig.shape[0] / samplerate * 1000 - 3000);
 
-    timestamps, tick_lengths, slider_lengths = get_all_ticks_and_lengths_from_ts(osu_dict["timing"]["uts"], osu_dict["timing"]["ts"], file_len);
+    timestamps, tick_lengths, slider_lengths = get_all_ticks_and_lengths_from_ts(osu_dict["timing"]["uts"], osu_dict["timing"]["ts"], file_len, divisor=divisor);
     ticks = np.array([i for i,k in enumerate(timestamps)]);
     # uts = osu_dict["timing"]["uts"][0];
     # ticks = np.array(list(range(0,int((file_len - uts["beginTime"])/uts["tickLength"]*4))));
@@ -410,9 +410,9 @@ def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.j
 
     np.savez_compressed(filename, ticks = ticks, timestamps = timestamps, wav = wav_data, extra = extra);
 
-def read_and_return_osu_file(path):
+def read_and_return_osu_file(path, divisor=4):
     osu_dict, wav_file = read_osu_file(path, convert = True);
-    data, flow_data = get_map_notes(osu_dict);
+    data, flow_data = get_map_notes(osu_dict, divisor=divisor);
     timestamps = [c[1] for c in data];
     wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);
     return data, wav_data, flow_data;
