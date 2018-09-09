@@ -70,9 +70,9 @@ if you don't have a good idea about what map to train with, you can use the defa
 - stage6 (completed)
 - stage7 (completed)
 - stage8 (?)
-- description 15%
-- more testing 30%
-- tensorflow.js 0%
+- description 66%
+- more testing 66%
+- tensorflow.js 66%
 - code comments -550%
 - create a map and rank it -99,999,999%
 
@@ -80,6 +80,6 @@ if you don't have a good idea about what map to train with, you can use the defa
 
 - stream regularization (done)
 - slider shape classification
-- deal with 1/3 and 1/1 maps (parametrize divisor)
-- spinner classification (kind of think this is impossible...)
-- play with tensorflow.js to make it usable for everyone
+- deal with 1/3 and 1/1 maps (parametrize divisor) (done?)
+- spinner classification (kind of think this is impossible)
+- play with tensorflow.js to make it usable for everyone (seems tfjs itself is not very mature there)
