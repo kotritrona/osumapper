@@ -32,13 +32,11 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
   - uses node.js to convert between map position data and .osu file
   - ~~most of its code is from 3 years ago~~
 
-## Requirements:
-- tensorflow v1.9.0 - v1.10.0
-- common python libs
-- soundfile
-- node.js
-- polynomial
-- ffmpeg
+## Installation:
+- install Python (3.5.x or 3.6.x) and Jupyter notebook
+- install [node.js](https://nodejs.org/)
+- install [ffmpeg](https://ffmpeg.org/download.html)
+- go into the ipynb folder and run `install.bat` or `./install` depending on system
 
 ## Running the model:
 1. prepare a maplist.txt containing .osu files and run 01_osumap_loader.ipynb
