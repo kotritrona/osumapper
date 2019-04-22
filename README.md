@@ -8,10 +8,10 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 - for tensorflow v2.0, see https://github.com/kotritrona/osumapper/tree/master/v6.2 (suggested, it's faster)
 
 ## Running the model:
-1. prepare a maplist.txt containing .osu files and run 01_osumap_loader.ipynb
+1. prepare a maplist.txt containing .osu files to train with, then run 01_osumap_loader.ipynb
 2. run 02_osurhythm_estimator.ipynb
 3. run 03_osurhythm_momentum_estimator.ipynb
-4. have a rest since #4 is not currently used
+4. take a deep breath
 5. prepare a new song with timing and run 05_newsong_importer.ipynb
 6. run 06_osurhythm_evaluator.ipynb
 7. run 07_osuflow_evaluator_from_rhythm.ipynb
