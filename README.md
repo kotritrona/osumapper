@@ -3,6 +3,22 @@ An automatic beatmap generator using Tensorflow / Deep Learning.
 
 demo map: https://osu.ppy.sh/beatmapsets/834264
 
+## Installation:
+- for tensorflow v1.12 and before, see https://github.com/kotritrona/osumapper/tree/master/v6.0
+- for tensorflow v2.0, see https://github.com/kotritrona/osumapper/tree/master/v6.2 (suggested, it's faster)
+
+## Running the model:
+1. prepare a maplist.txt containing .osu files and run 01_osumap_loader.ipynb
+2. run 02_osurhythm_estimator.ipynb
+3. run 03_osurhythm_momentum_estimator.ipynb
+4. have a rest since #4 is not currently used
+5. prepare a new song with timing and run 05_newsong_importer.ipynb
+6. run 06_osurhythm_evaluator.ipynb
+7. run 07_osuflow_evaluator_from_rhythm.ipynb
+8. find the generated .osu file under the ipynb folder and try it out in osu!
+
+if you don't have a good idea about what map to train with, you can use the default model and start from step #5.
+
 ## Model Specification:
 ![Diagram of structure](osunn_structure.jpg)
 
@@ -31,24 +47,6 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 - Beatmap Converter
   - uses node.js to convert between map position data and .osu file
   - ~~most of its code is from 3 years ago~~
-
-## Installation:
-- install Python (3.5.x or 3.6.x) and Jupyter notebook
-- install [node.js](https://nodejs.org/)
-- install [ffmpeg](https://ffmpeg.org/download.html)
-- go into the ipynb folder and run `install.bat` or `./install` depending on system
-
-## Running the model:
-1. prepare a maplist.txt containing .osu files and run 01_osumap_loader.ipynb
-2. run 02_osurhythm_estimator.ipynb
-3. run 03_osurhythm_momentum_estimator.ipynb
-4. have a rest since #4 is not currently used
-5. prepare a new song with timing and run 05_newsong_importer.ipynb
-6. run 06_osurhythm_evaluator.ipynb
-7. run 07_osuflow_evaluator_from_rhythm.ipynb
-8. find the generated .osu file under the ipynb folder and try it out in osu!
-
-if you don't have a good idea about what map to train with, you can use the default model and start from step #5.
 
 ## Environments tested:
 - win10, canopy, python3.5, tf1.9.0, no cuda
