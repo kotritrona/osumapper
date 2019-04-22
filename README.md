@@ -19,7 +19,8 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 
 if you don't have a good idea about what map to train with, you can use the default model and start from step #5.
 
-also don't train with every single map in your osu!, it's not how machine learning works. it's suggested you select the good maps you think.
+also don't train with every single map in your osu!, it's not how machine learning works.
+it's suggested you select only the good maps you think, for example {all maps with star 5.0 ~ 6.5 mapped by <mappers you like>}.
 
 ## Model Specification:
 ![Diagram of structure](osunn_structure.jpg)
