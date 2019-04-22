@@ -1,0 +1,49 @@
+# ignore map files
+v*.*/mapdata/*.npz
+
+# intermediate results
+v*.*/dcm_dataset
+v*.*/evaluatedRhythm.json
+v*.*/mapthis.json
+v*.*/mapthis.npz
+v*.*/rhythm_data.npz
+v*.*/wavdata.json
+v*.*/wavfile.wav
+v*.*/temp_json_file.json
+
+# model
+# flow_dataset.npz
+# saved_rhythm_model
+# saved_rhythm_model_momentums
+# saved_slider_model1
+# saved_slider_model2
+# momentum_minmax.npy
+
+# maps
+*.osu
+*.osz
+*.osb
+
+# did not work
+v*.*/16_osurhythm_evaluator_lesser.ipynb
+v*.*/saved_rhythm_model_lesser
+v*.*/saved_rhythm_model_momentums_lesser
+v*.*/momentum_minmax_lesser.json
+js/
+docker/
+
+# generated files
+v*.*/node_modules/
+v*.*/.ipynb_checkpoints/
+v*.*/__pycache__/
+v*.*/logs/
+*.sublime-project
+*.sublime-workspace
+.vscode/
+
+# local reference files
+full_maplist.txt
+osunn.pptx
+predictor_input.json
+predictor_output.json
+test/
