@@ -1,6 +1,6 @@
 # osumapper v6.2
 
-This version uses Tensorflow v2.0.0-alpha0.
+This version uses Tensorflow v2.0.0-beta1.
 
 ## Installation:
 - install Python (3.5.x or 3.6.x or 3.7.x) and Jupyter notebook
