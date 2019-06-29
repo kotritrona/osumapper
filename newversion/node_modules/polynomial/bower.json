@@ -1,0 +1,33 @@
+{
+    "name": "polynomial.js",
+    "main": "polynomial.js",
+    "version": "1.4.3",
+    "homepage": "https://github.com/infusion/Polynomial.js",
+    "description": "A polynomial library",
+    "dependencies": {
+        "fraction.js": "*",
+        "complex.js": "*"
+    },
+    "keywords": ["math", "poly", "polynomial", "number", "complex", "rational", "parser"],
+    "moduleType": [
+      "amd",
+      "globals",
+      "node"
+    ],
+    "authors": [
+        "Robert Eisele <robert@xarg.org> (http://www.xarg.org/)"
+    ],
+    "license": [
+        "MIT",
+        "GPL"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/infusion/Polynomial.js.git"
+    },
+    "ignore": [
+        "tests",
+        ".travis.yml",
+        "package.json"
+    ]
+}

@@ -1,0 +1,164 @@
+<!doctype HTML>
+<html>
+
+    <head>
+
+        <title>Quaternion.js - CSS Example</title>
+
+        <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+        <style>
+
+            html, body {
+                margin:0;
+                padding:0;
+                height:100%;
+                width:100%;
+            }
+
+            #main {
+                background: rgb(0,75,130);
+                background: -webkit-linear-gradient(35deg, rgb(195,60,110), rgb(0,75,130)); 
+                background: -o-linear-gradient(90deg, rgb(195,60,110), rgb(0,75,130)); 
+                background: -moz-linear-gradient(90deg, rgb(195,60,110), rgb(0,75,130)); 
+                background: linear-gradient(135deg, rgb(195,60,110), rgb(0,75,130));
+                height:100%;
+                width:100%;
+            }
+
+            #frame {
+                border: 1px solid rgb(125,185,210);
+                width: 50%;
+                height: 20%;
+                position: relative;
+                top: 40%;
+                transform: translateY(-50%);
+                left:25%;
+                text-align:center;
+                color:white;
+                transform-origin: 50% 50%;
+                backface-visibility: visible;
+                -webkit-user-select: none;
+                -webkit-user-drag: none;
+            }
+
+            #frame h1 {
+                font-family: 'Pacifico', cursive;
+                font-size:40px;
+                margin:0;
+                position: relative;
+                top: 20%;
+            }
+
+            #note {
+                font-family:Arial;
+                font-size: 12px;
+                color:white;
+                position:absolute;
+                bottom:0px;
+            }
+
+        </style>
+
+    </head>    
+
+    <body>
+
+        <div id="main">
+
+            <div id="frame">
+                <h1>Quaternion.js</h1>
+            </div>
+
+            <div id="note">Rotate your device or press X, Y or Z and drag the box</div>
+        </div>
+
+        <script src="../quaternion.js"></script>
+        <script>
+
+            (function(window) {
+
+              var frameStyle = document.getElementById('frame').style;
+
+              var RQ = new Quaternion;
+              window.addEventListener("deviceorientation", function(ev) {
+
+                if (ev.alpha !== null) {
+                  vars.x = ev.beta / 180 * Math.PI;
+                  vars.y = ev.gamma / 180 * Math.PI;
+                  vars.z = ev.alpha / 180 * Math.PI;
+                } else {
+                  vars.x = vars.y = vars.z = -1;
+                }
+
+              }, true);
+
+              var START = 0;
+              var STATE = 0;
+
+              var vars = {
+                x: 0,
+                y: .7,
+                z: 0
+              };
+              var varsDest = {
+                x: .4,
+                y: 0,
+                z: 0
+              };
+
+              var updateModel = function(time) {
+
+                var quat = null;
+
+                if (STATE === 0) {
+
+                  var p = (time - START) / 500;
+
+                  if (p >= 1) {
+                    p = 1;
+                    START = time;
+                    STATE++;
+                  }
+
+                  // Abuse $vars here as axis elements
+                  var y = vars.y + (varsDest.y - vars.y) * p;
+                  var x = vars.x + (varsDest.x - vars.x) * p;
+
+                  var angle = x * y * 2 * Math.PI;
+                  var axis = [x, y, 0, 0];
+
+                  quat = RQ.setFromAxisAngle(axis, angle);
+
+                } else if (STATE === 1) {
+
+                  // Listening for rotation events
+
+                  if (vars.z === -1 && vars.x === -1 && vars.y === -1)
+                    return;
+
+                  quat = RQ.setFromEuler(vars.z, vars.x, vars.y, 'ZXY').conjugate();
+                }
+
+                frameStyle.transform = "matrix3d(" + quat.toMatrix4() + ")";
+              };
+
+
+
+              function loop(time) {
+
+                updateModel(time);
+
+                window.requestAnimationFrame(loop);
+              }
+
+              window.requestAnimationFrame(function(time) {
+                START = time;
+                loop(time);
+              });
+
+            })(this);
+
+        </script>
+    </body>
+
+</html>

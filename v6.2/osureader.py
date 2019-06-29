@@ -421,3 +421,11 @@ def read_and_return_osu_file(path, divisor=4):
 # pd.DataFrame(data).to_csv("hmmmm.csv", header=["TICK", "TIME", "NOTE", "NOTE_TYPE", "SLIDING", "SPINNING", "MOMENTUM", "ANGULAR_MOMENTUM"]);
 # print(subprocess.call("node load_map.js j pinkheart.osu t.json"));
 # print(subprocess.call(["node", "load_map.js", "o", "t.json", "z.osu"]));
+
+def test_process_path(path):
+    try:
+        subprocess.call([path, "--version"]);
+        return True;
+    except:
+        print("Cannot find executable on {}".format(path));
+        return False;

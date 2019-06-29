@@ -1,0 +1,2 @@
+if this file is deleted the folder will disappear!!! and it cannot save .npzs here
+but I should make folder creation code instead. _(:з)∠)_
