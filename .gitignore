@@ -31,6 +31,7 @@ v*.*/saved_rhythm_model_momentums_lesser
 v*.*/momentum_minmax_lesser.json
 js/
 docker/
+test/
 
 # generated files
 v*.*/node_modules/
