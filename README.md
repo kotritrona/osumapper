@@ -18,7 +18,7 @@ it's suggested you select only maps you think are well made, for example {all ma
 
 ## Running the model:
 1. prepare your maplist.txt containing paths to .osu files to train with (see collecting maps to use and maplist creation sections)
-2  run 01_osumap_loader.ipynb to train using your maplist.txt
+2.  run 01_osumap_loader.ipynb to train using your maplist.txt
 3. run 02_osurhythm_estimator.ipynb
 4. run 03_osurhythm_momentum_estimator.ipynb
 5. take a deep breath
