@@ -1,6 +1,6 @@
 import glob
 
-osupath = input('Please enter the path to your osu songs folder: ')
+osupath = input('Please enter the path to your osu songs folder for training: ')
 verbose = input('Show verbose output? y/n: ')
 files = glob.glob(osupath + '/**/*.osu', recursive = True) 
 numwritten = 0
