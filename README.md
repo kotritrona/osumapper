@@ -7,20 +7,25 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 - for tensorflow v1.12 and before, see https://github.com/kotritrona/osumapper/tree/master/v6.0
 - for tensorflow v2.0, see https://github.com/kotritrona/osumapper/tree/master/v6.2 (suggested, it's faster)
 
+## Collecting maps to use:
+don't train with every single map in your osu!, that's not how machine learning works!
+it's suggested you select only maps you think are well made, for example {all maps with a star rating of 5.0 ~ 6.5 mapped by mappers you like}.
+(the easiest way to go about this is copy the entirety of a map folder that you want to use from your osu songs directory and paste it into another folder where you want to collect maps)
+
+## Maplist.txt creation:
+- the easiest way to create a maplist.txt file to train the model is by using the maplist creator.py script (found in both folders)
+- running this should overwrite the maplist.txt in the folder with a new one using the maps from the collection folder you have specified (again, do not do all of your osu maps, make a collection of a limited amount to train the model with)
+
 ## Running the model:
-1. prepare a maplist.txt containing .osu files to train with, then run 01_osumap_loader.ipynb
-2. run 02_osurhythm_estimator.ipynb
-3. run 03_osurhythm_momentum_estimator.ipynb
-4. take a deep breath
-5. prepare a new song with timing and run 05_newsong_importer.ipynb
-6. run 06_osurhythm_evaluator.ipynb
-7. run 07_osuflow_evaluator_from_rhythm.ipynb
-8. find the generated .osu file under the ipynb folder and try it out in osu!
-
-if you don't have a good idea about what map to train with, you can use the default model and start from step #5.
-
-also don't train with every single map in your osu!, it's not how machine learning works.
-it's suggested you select only the good maps you think, for example {all maps with star 5.0 ~ 6.5 mapped by \[mappers you like\]}.
+1. prepare your maplist.txt containing paths to .osu files to train with (see collecting maps to use and maplist creation sections)
+2.  run 01_osumap_loader.ipynb to train using your maplist.txt
+3. run 02_osurhythm_estimator.ipynb
+4. run 03_osurhythm_momentum_estimator.ipynb
+5. take a deep breath
+6. prepare a new song with timing and run 05_newsong_importer.ipynb
+7. run 06_osurhythm_evaluator.ipynb
+8. run 07_osuflow_evaluator_from_rhythm.ipynb
+9. find the generated .osu file under the ipynb folder and try it out in osu!
 
 ## Model Specification:
 ![Diagram of structure](osunn_structure.jpg)
