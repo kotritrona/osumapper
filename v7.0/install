@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+apt install -y ffmpeg
+pip install -r requirements.txt
+npm i

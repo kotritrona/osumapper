@@ -2,7 +2,7 @@
 v*.*/mapdata/*.npz
 
 # intermediate results
-v*.*/dcm_dataset
+v*.*/flow_dataset.npz
 v*.*/evaluatedRhythm.json
 v*.*/mapthis.json
 v*.*/mapthis.npz
@@ -10,6 +10,7 @@ v*.*/rhythm_data.npz
 v*.*/wavdata.json
 v*.*/wavfile.wav
 v*.*/temp_json_file.json
+v*.*/temp/*
 
 # model
 # flow_dataset.npz
@@ -24,6 +25,12 @@ v*.*/temp_json_file.json
 *.osz
 *.osb
 
+# ffmpeg
+ffmpeg.exe
+
+# as the name suggests
+unused/
+
 # did not work
 v*.*/16_osurhythm_evaluator_lesser.ipynb
 v*.*/saved_rhythm_model_lesser
@@ -36,7 +43,7 @@ test/
 # generated files
 v*.*/node_modules/
 v*.*/.ipynb_checkpoints/
-v*.*/__pycache__/
+**/__pycache__/
 v*.*/logs/
 *.sublime-project
 *.sublime-workspace

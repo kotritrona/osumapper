@@ -1,34 +1,36 @@
 # osumapper
+
 An automatic beatmap generator using Tensorflow / Deep Learning.
 
 demo map: https://osu.ppy.sh/beatmapsets/834264
 
-## Installation:
-- for tensorflow v1.12 and before, see https://github.com/kotritrona/osumapper/tree/master/v6.0
-- for tensorflow v2.0, see https://github.com/kotritrona/osumapper/tree/master/v6.2 (suggested, it's faster)
+## Colaboratory
 
-## Collecting maps to use:
-don't train with every single map in your osu!, that's not how machine learning works!
-it's suggested you select only maps you think are well made, for example {all maps with a star rating of 5.0 ~ 6.5 mapped by mappers you like}.
-(the easiest way to go about this is copy the entirety of a map folder that you want to use from your osu songs directory and paste it into another folder where you want to collect maps)
+Use Colab.ipynb (TODO: Make sure it works)
+
+## About v7.0
+
+Currently WIP. You can use 6.2 or try it out now.
+
+## Installation & Model Running
+
+- Refer to https://github.com/kotritrona/osumapper/tree/master/v6.2 for version 6.2
+- Refer to https://github.com/kotritrona/osumapper/tree/master/v7.0 for version 7.0
+
+## Important tip for model training
+
+Don't train with every single map in your osu!. That's not how machine learning works!
+
+I would suggest you select only maps you think are well made, for instance a mapset that contains all 5.0 ~ 6.5☆ maps mapped by (insert mapper name).
+
+(I'm going to make a maplist generator later, probably)
 
 ## Maplist.txt creation:
-- the easiest way to create a maplist.txt file to train the model is by using the maplist creator.py script (found in both folders)
+- the easiest way to create a maplist.txt file to train the model is by using the maplist creator.py script (found in v6.2 folder)
 - running this should overwrite the maplist.txt in the folder with a new one using the maps from the collection folder you have specified (again, do not do all of your osu maps, make a collection of a limited amount to train the model with)
 
-## Running the model:
-1. prepare your maplist.txt containing paths to .osu files to train with (see collecting maps to use and maplist creation sections)
-2.  run 01_osumap_loader.ipynb to train using your maplist.txt
-3. run 02_osurhythm_estimator.ipynb
-4. run 03_osurhythm_momentum_estimator.ipynb
-5. take a deep breath
-6. prepare a new song with timing and run 05_newsong_importer.ipynb
-7. run 06_osurhythm_evaluator.ipynb
-8. run 07_osuflow_evaluator_from_rhythm.ipynb
-9. find the generated .osu file under the ipynb folder and try it out in osu!
-
-## Model Specification:
-![Diagram of structure](osunn_structure.jpg)
+## Model Specification
+[Structure diagram](osunn_structure.jpg)
 
 - Rhythm model
   - CNN/LSTM + dense layers
@@ -54,36 +56,8 @@ it's suggested you select only maps you think are well made, for example {all ma
   - trains 6 ~ 25 big epochs each group. mostly 6 epochs unless the generated map is out of the mapping region (0:512, 0:384).
 - Beatmap Converter
   - uses node.js to convert between map position data and .osu file
-  - ~~most of its code is from 3 years ago~~
+  - ~~most of its code is from 5 years ago~~
 
-## Environments tested:
-- win10, canopy, python3.5, tf1.9.0, no cuda
-- win10, canopy, python3.5, tf1.10.0, no cuda
-- google colaboratory, no GPU
-- anaconda3, python3.6, tf1.10.0, the machine has no graphics card
-- previous environments with GPU enabled - probably needs to set batch_size=(some smaller value) otherwise it will randomly go out of memory!!
+## Citing
 
-## Current Progress:
-
-- stage0 (completed)
-- stage1 (completed)
-- stage2 (completed)
-- stage3 (completed)
-- stage4 (completed)
-- stage5 (completed)
-- stage6 (completed)
-- stage7 (completed)
-- stage8 (?)
-- description 66%
-- more testing 66%
-- tensorflow.js 66%
-- code comments -550%
-- create a map and rank it -99,999,999%
-
-## TODO:
-
-- stream regularization (done)
-- slider shape classification
-- deal with 1/3 and 1/1 maps (parametrize divisor) (done?)
-- spinner classification (kind of think this is impossible)
-- play with tensorflow.js to make it usable for everyone (seems tfjs itself is not very mature there)
+If you want to cite osumapper in a scholarly work, please cite the github page. I'm not going to write a paper for it.

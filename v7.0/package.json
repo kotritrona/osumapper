@@ -1,0 +1,20 @@
+{
+  "name": "osumapper",
+  "version": "6.2.0",
+  "description": "An automatic beatmap generator using Tensorflow / Deep Learning.",
+  "main": "load_map.js",
+  "dependencies": {
+    "polynomial": "^1.4.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kotritrona/osumapper.git"
+  },
+  "author": "kotritrona",
+  "license": "Apache-2.0"
+}

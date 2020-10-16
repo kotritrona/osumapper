@@ -1,2 +1,0 @@
-#Add directories to .osu files here! Heres an example:
-D:\osu!\Songs\114987 An - artcore JINJA\An - artcore JINJA (Flower) [Skystar].osu
