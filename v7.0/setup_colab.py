@@ -24,7 +24,7 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2
-            };
+            }
         },
         "default2" : {
             "rhythm_model" : "models/default/rhythm_model",
@@ -44,7 +44,7 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2
-            };
+            }
         }
     };
     return model_data[model_name];
