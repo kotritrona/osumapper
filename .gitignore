@@ -2,7 +2,6 @@
 v*.*/mapdata/*.npz
 
 # intermediate results
-v*.*/flow_dataset.npz
 v*.*/evaluatedRhythm.json
 v*.*/mapthis.json
 v*.*/mapthis.npz
