@@ -11,7 +11,7 @@ This version uses Tensorflow v2.3.1.
 
 ## Colaboratory
 
-Use Colab.ipynb (TODO: Make sure it works)
+https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/Colab.ipynb
 
 ## Installation
 

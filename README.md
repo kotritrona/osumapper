@@ -6,7 +6,7 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 
 ## Colaboratory
 
-Use Colab.ipynb (TODO: Make sure it works)
+https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/Colab.ipynb
 
 ## About v7.0
 
