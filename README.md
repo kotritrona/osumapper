@@ -23,7 +23,7 @@ Don't train with every single map in your osu!. That's not how machine learning 
 
 I would suggest you select only maps you think are well made, for instance a mapset that contains all 5.0 ~ 6.5☆ maps mapped by (insert mapper name).
 
-(I'm going to make a maplist generator later, probably)
+There is a maplist generator under `v7.0/`. Run `node maplist_gen.js` under the directory to start.
 
 ## Maplist.txt creation:
 - the easiest way to create a maplist.txt file to train the model is by using the maplist creator.py script (found in v6.2 folder)
