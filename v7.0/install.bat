@@ -1,5 +1,5 @@
 @echo off
-conda install -y -c conda-forge ffmpeg
 pip install -r requirements.txt
-npm i
+call npm i
+call conda install -y -c conda-forge ffmpeg
 echo Install complete.

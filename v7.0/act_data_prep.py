@@ -21,7 +21,7 @@ def step1_load_maps():
         os.mkdir(mapdata_path);
 
     # Open maplist
-    with open("maplist.txt") as fp:
+    with open("maplist.txt", encoding="utf8") as fp:
         fcont = fp.readlines();
 
     # Reset results

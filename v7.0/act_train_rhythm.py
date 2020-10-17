@@ -126,8 +126,6 @@ def train_test_split(train_data2, div_data2, train_labels2, test_split_count=233
 
 # (train_data_unfiltered, div_data_unfiltered, train_labels_unfiltered) = read_all_npzs();
 
-train_file_list = read_npz_list();
-
 
 def set_param_fallback(PARAMS):
     try:
@@ -193,7 +191,6 @@ def build_model():
                 metrics=[keras.metrics.mae])
     return final_model
 
-model = build_model();
 
 def plot_history(history):
     plt.figure()
@@ -216,10 +213,16 @@ class PrintDot(keras.callbacks.Callback):
         if epoch % 100 == 0: print('')
         print('.', end='')
 
+def step2_build_model():
+    model = build_model();
+    return model;
 
-def step2_train_model(PARAMS):
+
+def step2_train_model(model, PARAMS):
     global history, new_train_data, new_div_data, new_train_labels, test_data, test_div_data, test_labels;
     PARAMS = set_param_fallback(PARAMS);
+
+    train_file_list = read_npz_list();
 
     # Don't worry, it will successfully overfit after those 16 epochs.
     EPOCHS = PARAMS["train_epochs"]
@@ -262,13 +265,14 @@ def step2_train_model(PARAMS):
                 # Manually print the dot
                 print('.', end='');
             print('');
+    return model;
 
 # [loss, mae] = model.evaluate([test_data, test_div_data], test_labels, verbose=0)
 
 # Accuracy
 from sklearn.metrics import f1_score;
 
-def step2_evaluate():
+def step2_evaluate(model):
     train_shape, div_shape, label_shape = get_data_shape();
 
     test_predictions = model.predict([test_data, test_div_data]).reshape((-1, time_interval, label_shape[1]))
@@ -293,7 +297,7 @@ def step2_evaluate():
         print("{} f1_score: {} from {}".format(k, f1_score(another_pred_result[:, i], actual_result[:, i]), f1_score(random_result[:, i], actual_result[:, i])))
 
 
-def step2_save():
+def step2_save(model):
     tf.keras.models.save_model(
         model,
         "saved_rhythm_model",

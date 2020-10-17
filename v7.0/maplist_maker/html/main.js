@@ -54,22 +54,33 @@ function ce(tag) {
     return document.createElement(tag);
 }
 
-function writeTable(array, baseQSList, className) {
+function writeTable(array, baseQSList, className, actionFunction) {
     baseQSList.forEach(qs => q(qs).innerHTML = "");
-    array.forEach(a => {
+    array.forEach((a, index) => {
         a.forEach((el, i) => {
             let grid = ce("div");
             grid.className = className || "";
             grid.textContent = el;
+            if(actionFunction) {
+                grid.addEventListener("click", actionFunction.bind(null, index));
+            }
             q(baseQSList[i]).appendChild(grid);
         });
     });
 }
 
+function mapTableActionFunction(index, evt) {
+    if(index == 0) {
+        return;
+    }
+    let selectedMap = currentMapset[index-1];
+    addToMaplist([selectedMap]);
+}
+
 function genMaplistTable(maps) {
     let array = [["Artist", "Title", "Creator", "Difficulty"]];
-    array = array.concat(maps.map(m => [m.artist_name_unicode, m.song_title_unicode, m.creator_name, m.difficulty]))
-    writeTable(array.slice(0, 501), [".maplist-col-artist", ".maplist-col-title", ".maplist-col-creator", ".maplist-col-diff"], "td-maplist");
+    array = array.concat(maps.map(m => [m.artist_name, m.song_title, m.creator_name, m.difficulty]))
+    writeTable(array.slice(0, 501), [".maplist-col-artist", ".maplist-col-title", ".maplist-col-creator", ".maplist-col-diff"], "td-maplist", mapTableActionFunction);
 }
 
 function filterMaps(maps, type, method, value, rev) {
@@ -116,7 +127,7 @@ function updateMethodType() {
 
 function addToMaplist(list) {
     let originalMaplist = q(".textarea-output").value.trim().split(/\r?\n/);
-    let newMaplist = list.map(m => osuPath + m.folder_name + "\\" + m.osu_file_name)
+    let newMaplist = list.map(m => osuPath + "Songs\\" + m.folder_name + "\\" + m.osu_file_name);
 
     let result = removeDuplicates(originalMaplist.concat(newMaplist)).filter(text => text.length > 0);
 
