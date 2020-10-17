@@ -6,7 +6,6 @@ This version uses Tensorflow v2.3.1.
 
 - train models
 - test with various maps
-- make sure colab works
 - make maplist generator
 
 ## Colaboratory

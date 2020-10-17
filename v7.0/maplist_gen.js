@@ -22,7 +22,7 @@ async function main() {
         }));
         res.end();
     });
-    app.use(bodyParser.json());
+    app.use(bodyParser.json({limit: '200mb'}));
     app.use("/save", function(req, res, next) {
         try {
             let contents = req.body.contents;
@@ -46,7 +46,5 @@ async function main() {
         opn("http://127.0.0.1:3424/");
         console.log('Node server listening on port 3424!');
     });
-
-    // open browser: require('opn')("http://127.0.0.1/");
 }
 main();

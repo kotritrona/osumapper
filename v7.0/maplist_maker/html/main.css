@@ -2,6 +2,126 @@ use strict {
     /* Make CS stricter */
 }
 
-random {
+body {
+    background: #ff52dc;
+}
 
+* {
+    font-family: Torus, Inter, "Helvetica Neue", "High Tower Text", sans-serif;
+}
+
+select, input[type="text"], textarea, .table-maplist, .filtered-count {
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: solid 1px white;
+    background: rgba(230, 230, 255, .3);
+}
+
+button {
+    border: none;
+    background: #ffa6ee;
+    transition: 500ms;
+}
+
+button:hover {
+    border: none;
+    cursor: pointer;
+    background: #ffe3fa;
+}
+
+.container {
+    position: absolute;
+    top: 10px;
+    left: 0;
+    width: 100vw;
+    height: calc(100vh - 30px);
+    display: grid;
+    grid-template-columns: 60px 1.5fr 1fr 1fr 60px;
+    grid-template-rows: calc(100vh - 30px);
+    grid-gap: 15px;
+
+}
+
+.col-left {
+    grid-column: 2/3;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 1fr 40px;
+    grid-gap: 5px;
+}
+
+.col-mid {
+    grid-column: 3/4;
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 190px 150px 1fr;
+    grid-gap: 10px;
+}
+
+.field-wrap {
+    display: grid;
+    grid-template-columns: 80px 1fr;
+    grid-template-rows: 40px 40px 40px 40px 40px 1fr;
+    grid-gap: 10px;
+}
+
+.button-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 40px 40px 40px 40px 40px 1fr;
+    grid-gap: 10px;
+}
+
+.col-right {
+    grid-column: 4/5
+    display: grid;
+    grid-template-columns: auto;
+    grid-template-rows: 1fr;
+    grid-gap: 5px;
+}
+
+.mid-text {
+    color: white;
+    text-align: right;
+    line-height: 40px;
+}
+
+.textarea-output {
+    height: 100%;
+    width: 100%;
+}
+
+.checkbox-wrapper {
+    line-height: 40px;
+}
+
+.filtered-count {
+    text-align: right;
+    line-height: 40px;
+    padding-right: 20px;
+}
+
+table {
+    border-spacing: 10px;
+    border-collapse: separate;
+}
+
+.td-maplist {
+    max-width: calc(10.7142857vw - 33px);
+    height: 25px;
+    white-space: nowrap;
+    margin-bottom: 5px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    background: rgba(230, 230, 255, .2);
+    padding: 0 3px 0 2px;
+}
+.maplist-table-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr 5px;
+    grid-template-rows: auto;
+    grid-gap: 5px;
+    overflow-y: scroll;
+    overflow-x: hidden;
 }

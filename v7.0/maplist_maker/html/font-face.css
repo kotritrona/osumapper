@@ -1,0 +1,13 @@
+@font-face{
+    font-family: Inter;
+    font-style: normal;
+    font-display: swap;
+    src: url(Inter-Regular.osu.woff2) format("woff2"),
+         url(Inter-Regular.osu.woff) format("woff");
+}
+@font-face{
+    font-family: Torus;
+    font-style: normal;
+    font-display: swap;
+    src: url(Torus-Regular.osu.otf);
+}
