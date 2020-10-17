@@ -6,7 +6,6 @@ This version uses Tensorflow v2.3.1.
 
 - train models
 - test with various maps
-- make maplist generator
 
 ## Colaboratory
 
@@ -39,6 +38,10 @@ Other Linux
 - start Jupyter Notebook
 - run 01_Training.ipynb for training
 - run 02_Mapmaking.ipynb for map making
+
+## Maplist Generator
+
+- Run `node maplist_gen.js` under the directory to use the maplist generator
 
 ## Difference from previous versions
 
