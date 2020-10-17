@@ -1,1 +1,1 @@
-# input .osu paths here!!
+# map paths here

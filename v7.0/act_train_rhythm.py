@@ -95,6 +95,7 @@ def get_data_shape():
     return (-1, 7, 32, 2), (-1, 3 + divisor), (-1, 5);
 
 def read_some_npzs_and_preprocess(npz_list):
+    train_shape, div_shape, label_shape = get_data_shape();
     td_list = [];
     dd_list = [];
     tl_list = [];
@@ -268,6 +269,8 @@ def step2_train_model(PARAMS):
 from sklearn.metrics import f1_score;
 
 def step2_evaluate():
+    train_shape, div_shape, label_shape = get_data_shape();
+
     test_predictions = model.predict([test_data, test_div_data]).reshape((-1, time_interval, label_shape[1]))
 
     flat_test_preds = test_predictions.reshape(-1, label_shape[1]);

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <meta charset="utf-8">
+        <title>osumapper maplist generator</title>
+        <link rel="stylesheet" type="text/css" href="main.css">
+        <script type="text/javascript" src="main.js"></script>
+        <script>
+        </script>
+    </head>
+    <body>
+    <div class="container">
+        <div class="col-left">
+        <table class="table-maplist">
+        <tbody class="tbody-maplist">
+        </tbody>
+        </table>
+        </div>
+        <div class="col-mid">
+        <div class="mid-text text-filter">Filter: </div><select class="select-filter">
+            <option>Artist</option>
+            <option>ArtistUnicode</option>
+            <option>Title</option>
+            <option>TitleUnicode</option>
+            <option>Map Creator</option>
+            <option>Difficulty Name</option>
+            <option>Source</option>
+            <option>Tags</option>
+            <option>All Text</option>
+            <option>Ranked Status</option>
+            <option>Circle Count</option>
+            <option>Slider Count</option>
+            <option>Spinner Count</option>
+            <option>Object Count</option>
+            <option>Last Modification Time</option>
+            <option>Approach Rate</option>
+            <option>Circle Size</option>
+            <option>HP Drain</option>
+            <option>Overall Difficulty</option>
+            <option>Slider Velocity</option>
+            <option>Star Rating Std</option>
+            <option>Star Rating Taiko</option>
+            <option>Star Rating Catch</option>
+            <option>Star Rating Mania</option>
+            <option>Drain Time</option>
+            <option>Total Time (secs)</option>
+            <option>Map osu.ppy.sh ID</option>
+            <option>Mapset osu.ppy.sh ID</option>
+            <option>Game Mode</option>
+        </select>
+        <div class="mid-text text-mode-t">Mode: </div><select class="select-mode-t">
+            <option>Exact Match</option>
+            <option>Contains</option>
+            <option>Regular Expression</option>
+        </select>
+        <div class="mid-text text-mode-n">Mode: </div><select class="select-mode-n">
+            <option>&gt;=</option>
+            <option>&lt;=</option>
+            <option>==</option>
+        </select>
+        <!-- for number type: >= <= == -->
+        <!-- for text: full match, contains, regex -->
+        <div class="mid-text text-text">Text: </div><input type="text" class="input-text" value="">
+        <button class="button-first-search">First Search</button><button class="button-first-search">Next Search</button>
+        </div>
+        <div class="col-right">
+        <textarea class="textarea-output"></textarea>
+        </div>
+    </div>
+    <script>
+    </script>
+    </body>
+</html>
