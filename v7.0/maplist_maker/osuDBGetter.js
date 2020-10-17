@@ -1,7 +1,7 @@
 'use strict';
 
 const fs = require("fs");
-const OsuDBParser = require("osu-db-parser");
+const OsuDBParser = require("./osu-db-parser/index.js");
 
 function getOsuDB(path) {
     let osuDBbuffer = Buffer.from(fs.readFileSync(path));

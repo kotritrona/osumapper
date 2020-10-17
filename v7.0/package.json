@@ -6,7 +6,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "opn": "^6.0.0",
-    "osu-db-parser": "^1.0.35",
+    "osu-buffer": "^1.3.5",
     "polynomial": "^1.4.3",
     "regedit": "^3.0.3"
   },

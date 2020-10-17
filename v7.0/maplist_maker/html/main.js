@@ -15,6 +15,7 @@ const propertyRetrievers = [
     a => a.n_sliders,
     a => a.n_spinners,
     a => a.n_hitcircles + a.n_sliders + a.n_spinners,
+    a => a.timing_points.length > 0 ? 60000 / a.timing_points[0][0] : 0,
     a => a.last_modification_time,
     a => a.approach_rate,
     a => a.circle_size,
@@ -146,7 +147,7 @@ function runFilterAction() {
 }
 
 function removeSubmode() {
-    currentMapset = filterMaps(currentMapset, 28, 2, 0, false);
+    currentMapset = currentMapset.filter(a => a.mode == 0);
     updateMapDisplay();
 }
 
