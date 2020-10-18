@@ -24,15 +24,18 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2
+            },
+            "modding" : {
+                "stream_regularizer" : 1
             }
         },
-        "default2" : {
-            "rhythm_model" : "models/default/rhythm_model",
-            "flow_dataset" : "models/default/flow_dataset.npz",
-            "rhythm_param" : [1, 0.32, 0, [0, 0, 0, 0], 8],
+        "vtuber" : {
+            "rhythm_model" : "models/vtuber/rhythm_model",
+            "flow_dataset" : "models/vtuber/flow_dataset.npz",
+            "rhythm_param" : [1, 0.37, 0.15, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
-                "good_epoch" : 6,
+                "good_epoch" : 8,
                 "max_epoch" : 25,
                 "note_group_size" : 10,
                 "g_epochs" : 7,
@@ -44,7 +47,12 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2
+            },
+            "modding" : {
+                "stream_regularizer" : 3
             }
         }
     };
+    if model_name not in model_data:
+        return model_data["default"];
     return model_data[model_name];

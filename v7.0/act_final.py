@@ -1,7 +1,7 @@
 'use strict'; # In case of future updates if Python wanted to mimic JS
 
 #
-# Part 7 .osu file JSON processing / output
+# Part 8 .osu file JSON processing / output
 #
 
 import re, json, datetime;
@@ -57,7 +57,7 @@ def get_osu_file_name(metadata):
     outname = re.sub("[^a-zA-Z0-9\(\)\[\] \.\,\!\~\`\{\}\-\_\=\+\&\^\@\#\$\%\;\']","", outname);
     return outname;
 
-def step7_save_osu_file(osu_map, data):
+def step8_save_osu_file(osu_map, data):
     """
     Save trained map to disk, using filename generated from its metadata.
     """
@@ -76,13 +76,14 @@ def step7_save_osu_file(osu_map, data):
     if(len(c) > 1):
         print(c.decode("utf-8"));
 
+    print("finished on: {}".format(datetime.datetime.now()));
+
+    return filename;
+
+def step8_clean_up():
     # clean up intermediate files
-    for item in ["mapthis.json", "timing.osu", "rhythm_data.npz", "mapthis.npz", "temp_json_file.json", "wavfile.wav", "temp/temp_json_file.json", "temp/wavfile.wav", "evaluatedRhythm.json"]:
+    for item in ["mapthis.json", "audio.mp3", "timing.osu", "rhythm_data.npz", "mapthis.npz", "temp_json_file.json", "wavfile.wav", "temp/temp_json_file.json", "temp/wavfile.wav", "evaluatedRhythm.json"]:
         try:
             os.remove(item);
         except:
             pass
-
-    print("finished on: {}".format(datetime.datetime.now()));
-
-    return filename;

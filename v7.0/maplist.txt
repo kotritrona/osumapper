@@ -1,1 +1,1 @@
-# add maps here
+# add .osu paths here

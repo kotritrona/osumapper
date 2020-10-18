@@ -300,6 +300,8 @@ def step2_evaluate(model):
     # Individual column predictions
     column_names = ["is_note_start", "is_circle", "is_slider", "is_spinner", "is_note_end"];
     for i, k in enumerate(column_names):
+        if i == 3: # No one uses spinners anyways
+            continue;
         print("{} f1_score: {} from {}".format(k, f1_score(another_pred_result[:, i], actual_result[:, i]), f1_score(random_result[:, i], actual_result[:, i])))
 
 

@@ -1293,7 +1293,7 @@ function main()
 
             generateSliders(json);
 
-            json.obj = streamRegularizer(json.obj);
+            // json.obj = streamRegularizer(json.obj);
 
             json.obj = newComboEvery2Metronome(json.obj, json.timing.uts);
 
