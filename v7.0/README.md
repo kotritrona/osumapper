@@ -41,7 +41,7 @@ Other Linux
 
 ## Maplist Generator
 
-- Run `node maplist_gen.js` under the directory to use the maplist generator
+- Run `node gen_maplist.js` under the directory to use the maplist generator
 
 ## Difference from previous versions
 
