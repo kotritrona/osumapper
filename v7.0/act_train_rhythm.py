@@ -23,6 +23,12 @@ time_interval = 16;
 #            SLIDING, SPINNING, MOMENTUM, EX1, EX2, EX3], length MAPTICKS
 #                  8,        9,       10,  11,  12,  13,
 # wav file, [len(snapsize), MAPTICKS, 2, fft_size//4]
+
+try: # Idk if it works
+    os.environ['TF_FORCE_GPU_ALLOW_GROWTH'] = "true"
+except:
+    pass
+
 def read_npz(fn):
     with np.load(fn) as data:
         wav_data = data["wav"];
