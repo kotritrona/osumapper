@@ -10,6 +10,8 @@ v*.*/wavdata.json
 v*.*/wavfile.wav
 v*.*/temp_json_file.json
 v*.*/temp/*
+v*.*/timing.osu
+v*.*/audio.mp3
 
 # model
 # flow_dataset.npz

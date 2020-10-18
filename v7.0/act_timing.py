@@ -77,7 +77,7 @@ def get_timed_osu_file(music_path, input_filename = "assets/template.osu", outpu
     osu_text = re.sub("{colors}",             get_colors(), osu_text)
     osu_text = re.sub("{hit_objects}",        "", osu_text)
 
-    with open(output_filename, 'w') as osu_output:
+    with open(output_filename, 'w', encoding="utf8") as osu_output:
         osu_output.write(osu_text)
 
     copy(music_path, "./audio.mp3")
