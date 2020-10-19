@@ -1,6 +1,6 @@
 'use strict';
 /*
- * MODULARIZED! YES!
+ * Modularized newcombo.js
  */
 (function(module) {
 
@@ -23,7 +23,7 @@ function getHitObjects(hoa) {
 }
 
 function output(p) {
-    /* NOPE PLZ BE SILENT */
+    /* Disable output */
     // console.log(p);
 }
 

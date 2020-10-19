@@ -1,7 +1,7 @@
-'use strict'; # In case of future updates if Python wanted to mimic JS
+# -*- coding: utf-8 -*-
 
 #
-# Installation functions
+# Colab functions
 #
 
 def load_pretrained_model(model_name):

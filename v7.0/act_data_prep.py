@@ -1,4 +1,4 @@
-'use strict'; # In case of future updates if Python wanted to mimic JS
+# -*- coding: utf-8 -*-
 
 #
 # Part 1 action script

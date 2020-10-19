@@ -1,4 +1,4 @@
-'use strict'; # In case of future updates if Python wanted to mimic JS
+# -*- coding: utf-8 -*-
 
 #
 # For osu! file reading and analysis
@@ -17,15 +17,16 @@ warnings.filterwarnings("ignore", message="PySoundFile failed. Trying audioread 
 workingdir = os.path.dirname(os.path.abspath(__file__));
 os.chdir(workingdir);
 
+# This ffmpeg path is unused
 if(os.path.isfile('./FFmpeg/ffmpeg.exe')):
     FFMPEG_PATH = "FFmpeg\\ffmpeg.exe";
 else:
     FFMPEG_PATH = "ffmpeg";
 
-# "convert" will also convert the music file, generating wavfile.wav in local path
 def read_osu_file(path, convert=False, wav_name="wavfile.wav", json_name="temp_json_file.json"):
     """
     Read .osu file to get audio path and JSON formatted map data
+    "convert" will also read the music file (despite the name it doesn't convert)
     """
     file_dir = os.path.dirname(os.path.abspath(path));
 
@@ -52,6 +53,9 @@ def read_osu_file(path, convert=False, wav_name="wavfile.wav", json_name="temp_j
     return map_dict, mp3_file;
 
 def get_freqs(sig, fft_size):
+    """
+    Do Fourier Transform and map imaginary to length/angle coordinates
+    """
     Lf = np.fft.fft(sig, fft_size);
     Lc = Lf[0:fft_size//2];
     La = np.abs(Lc[0:fft_size//2]);
@@ -63,6 +67,9 @@ def slice_wave_at(ms, sig, samplerate, size):
     return sig[max(0, int(ind - size//2)):int(ind + size - size//2)];
 
 def lrmix(sig):
+    """
+    Get mono from stereo audio data. Unused in this version (already mono)
+    """
     return (sig[:,0]+sig[:,1])/2;
 
 def get_wav_data_at(ms, sig, samplerate, fft_size=2048, freq_low=0, freq_high=-1):
@@ -83,6 +90,14 @@ def get_wav_data_at(ms, sig, samplerate, fft_size=2048, freq_low=0, freq_high=-1
     return La, Lg;
 
 def read_wav_data(timestamps, wavfile, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 1024):
+    """
+    Read audio data based on timestamps.
+
+    Snapint are percentages of difference between two timestamps.
+    These are read to handle potential small offset differences between python and osu!.
+
+    Resampling disabled for librosa because it is too slow.
+    """
     sig, samplerate = librosa.load(wavfile, sr=None, mono=True);
     data = list();
 
@@ -193,6 +208,9 @@ def read_and_return_osu_file(path, divisor=4):
     return data, wav_data, flow_data;
 
 def test_process_path(path):
+    """
+    Use the version command to test if a dependency works
+    """
     try:
         subprocess.call([path, "--version"]);
         return True;
