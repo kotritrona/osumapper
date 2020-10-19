@@ -1,0 +1,56 @@
+osu file format v14
+
+[General]
+AudioFilename: {audio_filename}
+AudioLeadIn: 0
+PreviewTime: -1
+Countdown: 0
+SampleSet: Soft
+StackLeniency: 0.5
+Mode: 0
+LetterboxInBreaks: 0
+WidescreenStoryboard: 1
+
+[Editor]
+DistanceSpacing: 1.0
+BeatDivisor: 4
+GridSize: 8
+TimelineZoom: 1
+
+[Metadata]
+Title:{title}
+TitleUnicode:{title}
+Artist:{artist}
+ArtistUnicode:{artist}
+Creator:osumapper
+Version:{version}
+Source:
+Tags:
+
+[Difficulty]
+HPDrainRate:{hp_drain}
+CircleSize:{circle_size}
+OverallDifficulty:{overall_difficulty}
+ApproachRate:{approach_rate}
+SliderMultiplier:{slider_velocity}
+SliderTickRate:1
+
+[Events]
+//Background and Video events
+//Break Periods
+//Storyboard Layer 0 (Background)
+//Storyboard Layer 1 (Fail)
+//Storyboard Layer 2 (Pass)
+//Storyboard Layer 3 (Foreground)
+//Storyboard Layer 4 (Overlay)
+//Storyboard Sound Samples
+
+[TimingPoints]
+{offset},{tickLength},4,2,1,100,1,0
+
+
+[Colours]
+{colors}
+
+[HitObjects]
+{hit_objects}

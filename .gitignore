@@ -21,11 +21,6 @@ v*.*/audio.mp3
 # saved_slider_model2
 # momentum_minmax.npy
 
-# maps
-*.osu
-*.osz
-*.osb
-
 # ffmpeg
 ffmpeg.exe
 
