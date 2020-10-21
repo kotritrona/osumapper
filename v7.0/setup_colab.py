@@ -4,6 +4,15 @@
 # Colab functions
 #
 
+import os
+
+def colab_clean_up(input_file_name):
+    for item in [input_file_name, "mapthis.json", "audio.mp3", "timing.osu", "rhythm_data.npz", "mapthis.npz"]:
+        try:
+            os.remove(item);
+        except:
+            pass
+
 def load_pretrained_model(model_name):
     model_data = {
         "default" : {
@@ -207,7 +216,7 @@ def load_pretrained_model(model_name):
                 "c_false_batch" : 10,
                 "note_distance_basis" : 120,
                 "next_from_slider_end" : True,
-                "max_ticks_for_ds" : 8
+                "max_ticks_for_ds" : 6
             },
             "modding" : {
                 "stream_regularizer" : 0
