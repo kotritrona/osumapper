@@ -1173,7 +1173,7 @@ function generateSlider(slider) {
         type: slider.type,
         time: slider.time,
         sliderPoints: _rsp,
-        sliderLength: g.len,
+        sliderLength: Math.round(g.len),
         sliderReverses: st.repeats
     });
     slider.sliderPoints = _rsp;
