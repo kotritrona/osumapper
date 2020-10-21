@@ -122,6 +122,11 @@ def read_some_npzs_and_preprocess(npz_list):
     return train_data2, div_data2, train_labels2;
 
 def train_test_split(train_data2, div_data2, train_labels2, test_split_count=233):
+    """
+    Split data into train and test.
+    Note that there is no randomization. It doesn't really matter here, but in other machine learning it's obligatory.
+    Requires at least 233 rows of data or it will throw an error. (Tick count/10, around 1.5-2 full length maps)
+    """
     new_train_data = train_data2[:-test_split_count];
     new_div_data = div_data2[:-test_split_count];
     new_train_labels = train_labels2[:-test_split_count];
@@ -157,6 +162,12 @@ def set_param_fallback(PARAMS):
 from tensorflow.keras.models import Model;
 
 def build_model():
+    """
+    Build the model.
+    Two inputs for wav_data and div_data (metadata) respectively.
+    Hyperparameters in the middle are tuned to make sure it runs smoothly on my machine.
+    You can try changing them in the middle if it achieves better result.
+    """
     train_shape, div_shape, label_shape = get_data_shape();
     model1 = keras.Sequential([
         keras.layers.TimeDistributed(keras.layers.Conv2D(16, (2, 2),
@@ -184,7 +195,7 @@ def build_model():
     dense3 = keras.layers.Dense(label_shape[1], activation=tf.nn.tanh)(dense2);
 
 
-
+    # I think the first is correct but whatever...
     try:
         optimizer = tf.optimizers.RMSprop(0.001) #Adamoptimizer?
     except:
@@ -276,9 +287,16 @@ def step2_train_model(model, PARAMS):
 # [loss, mae] = model.evaluate([test_data, test_div_data], test_labels, verbose=0)
 
 # Accuracy
-from sklearn.metrics import f1_score;
+from sklearn.metrics import roc_auc_score;
 
 def step2_evaluate(model):
+    """
+    Evaluate model using AUC score.
+    Previously I used F1 but I think AUC is more appropriate for this type of data.
+
+    High value (close to 1.00) doesn't always mean it's better. Usually it means you put identical maps in the training set.
+    It shouldn't be possible to reach very high accuracy since that will mean that music 100% dictates map rhythm.
+    """
     train_shape, div_shape, label_shape = get_data_shape();
 
     test_predictions = model.predict([test_data, test_div_data]).reshape((-1, time_interval, label_shape[1]))
@@ -286,23 +304,15 @@ def step2_evaluate(model):
     flat_test_preds = test_predictions.reshape(-1, label_shape[1]);
     flat_test_labels = test_labels.reshape(-1, label_shape[1]);
 
-    pred_result = (np.sign(flat_test_preds) + 1) / 2
+    pred_result = (flat_test_preds + 1) / 2
     actual_result = (flat_test_labels + 1) / 2
-
-    random_result = (1 + np.sign(-1 + 2 * np.random.random(size=pred_result.shape))) / 2;
-
-    is_obj_pred = (1 + np.sign(flat_test_preds[:, 0:1])) / 2;
-    obj_type_pred = np.sign(flat_test_preds[:, 1:4] - np.tile(np.expand_dims(np.max(flat_test_preds[:, 1:4], axis=1), 1), (1, 3))) + 1;
-    others_pred = (1 + np.sign(flat_test_preds[:, 4:label_shape[1]] + 0.5)) / 2;
-    # Only predict obj_type when there is an object!
-    another_pred_result = np.concatenate([is_obj_pred, is_obj_pred * obj_type_pred, others_pred], axis=1);
 
     # Individual column predictions
     column_names = ["is_note_start", "is_circle", "is_slider", "is_spinner", "is_note_end"];
     for i, k in enumerate(column_names):
         if i == 3: # No one uses spinners anyways
             continue;
-        print("{} f1_score: {} from {}".format(k, f1_score(another_pred_result[:, i], actual_result[:, i]), f1_score(random_result[:, i], actual_result[:, i])))
+        print("{} auc score: {}".format(k, roc_auc_score(actual_result[:, i], pred_result[:, i])))
 
 
 def step2_save(model):
@@ -313,7 +323,3 @@ def step2_save(model):
         include_optimizer=True,
         save_format="h5"
     );
-
-    # WARNING:tensorflow:TensorFlow optimizers do not make it possible to access optimizer attributes or optimizer
-    # state after instantiation. As a result, we cannot save the optimizer as part of the model save file.You will
-    # have to compile your model again after loading it. Prefer using a Keras optimizer instead (see keras.io/optimizers).
