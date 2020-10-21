@@ -40,6 +40,7 @@ I would suggest you select only maps you think are well made, for instance a map
   - output (momentum, angular_momentum) as regression
   - momentum is distance over time. It should be proportional to circle size which I may implement later.
   - angular_momentum is angle over time. currently unused.
+  - it's only used in v6.2
 - Slider model
   - was designed to classify slider lengths and shapes
   - currently unused
@@ -53,8 +54,7 @@ I would suggest you select only maps you think are well made, for instance a map
   - every big epoch(?), trains generator for 7 epochs and then discriminator 3 epochs
   - trains 6 ~ 25 big epochs each group. mostly 6 epochs unless the generated map is out of the mapping region (0:512, 0:384).
 - Beatmap Converter
-  - uses node.js to convert between map position data and .osu file
-  - ~~most of its code is from 5 years ago~~
+  - uses node.js to convert map data between JSON and .osu formats
 
 ## Citing
 

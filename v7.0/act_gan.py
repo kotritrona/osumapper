@@ -604,6 +604,10 @@ def step6_run_all(flow_dataset_npz = "flow_dataset.npz"):
     # get basis
     note_distance_basis = GAN_PARAMS["note_distance_basis"];
 
+    # get next_from_slider_end
+    next_from_slider_end = GAN_PARAMS["next_from_slider_end"];
+
+
     # should be slider length each tick, which is usually SV * SMP * 100 / 4
     # e.g. SV 1.6, timing section x1.00, 1/4 divisor, then slider_length_base = 40
     slider_length_base = sv // divisor;
@@ -623,7 +627,11 @@ def step6_run_all(flow_dataset_npz = "flow_dataset.npz"):
     slider_lengths = np.array([slider_type_length[int(k)] * slider_length_base[i] for i, k in enumerate(slider_types)]) * slider_ticks;
 
     tick_diff = np.concatenate([[100], ticks[1:] - ticks[:-1]])
-    note_distances = np.clip(tick_diff, 1, divisor) * (note_distance_basis / divisor)
+
+    if next_from_slider_end:
+        tick_diff = np.concatenate([[100], tick_diff[1:] - np.floor(slider_ticks * is_slider)[:-1]])
+
+    note_distances = np.clip(tick_diff, 1, divisor * 2) * (note_distance_basis / divisor)
 
     # Load the flow dataset saved in part 4
     with np.load(flow_dataset_npz) as flow_dataset:

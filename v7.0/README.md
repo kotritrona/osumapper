@@ -43,6 +43,11 @@ Other Linux
 
 - Run `node gen_maplist.js` under the directory to use the maplist generator
 
+## Training in Colaboratory
+
+- You have to generate .npz map data using the first code block of 01_Training.ipynb and upload them to Google Drive
+- After that, use https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/Colab_Training.ipynb
+
 ## Difference from previous versions
 
 - Cleaned up code, removed much useless code

@@ -32,7 +32,7 @@ def load_pretrained_model(model_name):
         "sota" : {
             "rhythm_model" : "models/sota/rhythm_model",
             "flow_dataset" : "models/sota/flow_dataset.npz",
-            "rhythm_param" : [1, 0.43, -0.15, [0, 0, 0, 0], 8],
+            "rhythm_param" : [1, 0.58, -0.15, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
                 "good_epoch" : 8,
@@ -78,7 +78,7 @@ def load_pretrained_model(model_name):
         "flower" : {
             "rhythm_model" : "models/flower/rhythm_model",
             "flow_dataset" : "models/flower/flow_dataset.npz",
-            "rhythm_param" : [1, 0.4, 0, [0, 0, 0, 0], 8],
+            "rhythm_param" : [1, 0.44, 0, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
                 "good_epoch" : 8,
@@ -206,7 +206,7 @@ def load_pretrained_model(model_name):
                 "c_true_batch" : 50,
                 "c_false_batch" : 10,
                 "note_distance_basis" : 120,
-                "next_from_slider_end" : False,
+                "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 8
             },
             "modding" : {
