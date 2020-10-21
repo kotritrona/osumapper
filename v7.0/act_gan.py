@@ -610,7 +610,7 @@ def step6_run_all(flow_dataset_npz = "flow_dataset.npz"):
 
     # should be slider length each tick, which is usually SV * SMP * 100 / 4
     # e.g. SV 1.6, timing section x1.00, 1/4 divisor, then slider_length_base = 40
-    slider_length_base = sv // divisor;
+    slider_length_base = sv / divisor;
 
     # these data must be kept consistent with the sliderTypes in load_map.js
     slider_types = np.random.randint(0, 5, is_slider.shape).astype(int); # needs to determine the slider types!! also it is 5!!!

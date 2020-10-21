@@ -196,7 +196,7 @@ def load_pretrained_model(model_name):
             "rhythm_param" : [1, 0.18, 0, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
-                "good_epoch" : 8,
+                "good_epoch" : 6,
                 "max_epoch" : 25,
                 "note_group_size" : 10,
                 "g_epochs" : 7,
