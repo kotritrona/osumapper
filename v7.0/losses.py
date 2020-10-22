@@ -10,9 +10,9 @@ from tensorflow.python.keras.losses import LossFunctionWrapper
 
 # A regularizer to keep the map inside the box.
 # It's so the sliders and notes don't randomly fly out of the screen!
-def inblock_loss(vg):
-    wall_var_l = tf.where(tf.less(vg, 0.2), tf.square(0.3 - vg), 0 * vg);
-    wall_var_r = tf.where(tf.greater(vg, 0.8), tf.square(vg - 0.7), 0 * vg);
+def inblock_loss(vg, border, value):
+    wall_var_l = tf.where(tf.less(vg, border), tf.square(value - vg), 0 * vg);
+    wall_var_r = tf.where(tf.greater(vg, 1 - border), tf.square(vg - (1 - value)), 0 * vg);
     return tf.reduce_mean(tf.reduce_mean(wall_var_l + wall_var_r, axis=2), axis=1);
 
 # Loss functions and mapping layer, to adapt to TF 2.0
@@ -38,12 +38,17 @@ class BoxCustomLoss(LossFunctionWrapper):
     If it gets close to the boundary then this loss function will produce positive value. Otherwise it is zero.
     """
     def __init__(self,
+        border,
+        value,
         reduction=losses_utils.ReductionV2.SUM_OVER_BATCH_SIZE,
         name='generative_custom_loss'):
 
+        self.loss_border = border
+        self.loss_value = value
+
         def box_loss(y_true, y_pred):
             map_part = y_pred;
-            return inblock_loss(map_part[:, :, 0:2]) + inblock_loss(map_part[:, :, 4:6])
+            return inblock_loss(map_part[:, :, 0:2], self.loss_border, self.loss_value) + inblock_loss(map_part[:, :, 4:6], self.loss_border, self.loss_value)
 
         super(BoxCustomLoss, self).__init__(box_loss, name=name, reduction=reduction)
 

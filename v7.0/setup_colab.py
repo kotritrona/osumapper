@@ -29,10 +29,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 2
+                "max_ticks_for_ds" : 2,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 1
@@ -41,10 +45,10 @@ def load_pretrained_model(model_name):
         "sota" : {
             "rhythm_model" : "models/sota/rhythm_model",
             "flow_dataset" : "models/sota/flow_dataset.npz",
-            "rhythm_param" : [1, 0.58, -0.15, [0, 0, 0, 0], 8],
+            "rhythm_param" : [1, 0.53, -0.15, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
-                "good_epoch" : 8,
+                "good_epoch" : 6,
                 "max_epoch" : 25,
                 "note_group_size" : 10,
                 "g_epochs" : 7,
@@ -52,10 +56,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 360,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 1
+                "max_ticks_for_ds" : 1,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 2
@@ -75,10 +83,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 2
+                "max_ticks_for_ds" : 2,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 3
@@ -98,10 +110,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 1
+                "max_ticks_for_ds" : 1,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 1
@@ -120,11 +136,15 @@ def load_pretrained_model(model_name):
                 "c_epochs" : 3,
                 "g_batch" : 50,
                 "g_input_size" : 50,
-                "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_true_batch" : 150,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 2
+                "max_ticks_for_ds" : 2,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 4
@@ -144,10 +164,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 300,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 2
+                "max_ticks_for_ds" : 2,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 1
@@ -167,10 +191,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 2
+                "max_ticks_for_ds" : 2,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 3
@@ -190,10 +218,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 160,
                 "next_from_slider_end" : False,
-                "max_ticks_for_ds" : 4
+                "max_ticks_for_ds" : 4,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 3
@@ -213,10 +245,14 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 50,
-                "c_false_batch" : 10,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 15,
                 "note_distance_basis" : 120,
                 "next_from_slider_end" : True,
-                "max_ticks_for_ds" : 6
+                "max_ticks_for_ds" : 6,
+                "box_loss_border" : 0.08,
+                "box_loss_value" : 0.15,
+                "box_loss_weight" : 1
             },
             "modding" : {
                 "stream_regularizer" : 0

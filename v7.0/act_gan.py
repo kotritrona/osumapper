@@ -26,9 +26,13 @@ GAN_PARAMS = {
     "g_input_size" : 50,
     "c_true_batch" : 50,
     "c_false_batch" : 10,
+    "c_randfalse_batch" : 10,
     "note_distance_basis" : 200,
     "next_from_slider_end" : False,
-    "max_ticks_for_ds" : 2
+    "max_ticks_for_ds" : 2,
+    "box_loss_border" : 0.08,
+    "box_loss_value" : 0.15,
+    "box_loss_weight" : 1
 };
 
 def step6_set_gan_params(params):
@@ -411,10 +415,10 @@ def mixed_model(generator, mapping_layer, discriminator, in_params):
     except:
         optimizer = tf.train.AdamOptimizer(0.001) #Adamoptimizer?
 
-    losses = [AlwaysZeroCustomLoss(), BoxCustomLoss(), GenerativeCustomLoss()];
+    losses = [AlwaysZeroCustomLoss(), BoxCustomLoss(GAN_PARAMS["box_loss_border"], GAN_PARAMS["box_loss_value"]), GenerativeCustomLoss()];
 
     model.compile(loss=losses,
-                  loss_weights=[1e-8, 1, 1],
+                  loss_weights=[1e-8, GAN_PARAMS["box_loss_weight"], 1],
                 optimizer=optimizer)
     return model
 
@@ -477,6 +481,7 @@ def generate_set(models, begin = 0, start_pos=[256, 192], group_id=-1, length_mu
     g_input_size = GAN_PARAMS["g_input_size"];
     c_true_batch = GAN_PARAMS["c_true_batch"];
     c_false_batch = GAN_PARAMS["c_false_batch"];
+    c_randfalse_batch = GAN_PARAMS["c_randfalse_batch"];
 
     reset_model_weights(models);
     set_extvar(models, extvar);
@@ -499,10 +504,14 @@ def generate_set(models, begin = 0, start_pos=[256, 192], group_id=-1, length_mu
         new_false_maps = predicted_maps_mapped;
         new_false_labels = np.zeros(c_false_batch);
 
+        # random numbers as negative samples
+        # special_train_data.shape[2] == 6
+        randfalse_maps = np.random.rand(c_randfalse_batch, note_group_size, special_train_data.shape[2]);
+        randfalse_labels = np.zeros(c_randfalse_batch);
 
         rn = np.random.randint(0, special_train_data.shape[0], (c_true_batch,))
-        actual_train_data = np.concatenate((new_false_maps, special_train_data[rn]), axis=0);
-        actual_train_labels = np.concatenate((new_false_labels, special_train_labels[rn]), axis=0);
+        actual_train_data = np.concatenate((new_false_maps, randfalse_maps, special_train_data[rn]), axis=0);
+        actual_train_labels = np.concatenate((new_false_labels, randfalse_labels, special_train_labels[rn]), axis=0);
 
 
         history2 = classifier_model.fit(actual_train_data, actual_train_labels, epochs=c_multiplier,
