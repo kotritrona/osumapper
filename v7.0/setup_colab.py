@@ -39,7 +39,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 1
+                "stream_regularizer" : 1,
+                "slider_mirror" : 1
             }
         },
         "sota" : {
@@ -66,7 +67,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 2
+                "stream_regularizer" : 2,
+                "slider_mirror" : 0
             }
         },
         "vtuber" : {
@@ -93,7 +95,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 3
+                "stream_regularizer" : 3,
+                "slider_mirror" : 1
             }
         },
         "flower" : {
@@ -120,7 +123,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 1
+                "stream_regularizer" : 1,
+                "slider_mirror" : 1
             }
         },
         "inst" : {
@@ -147,7 +151,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 4
+                "stream_regularizer" : 4,
+                "slider_mirror" : 1
             }
         },
         "lowbpm" : {
@@ -174,7 +179,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 1
+                "stream_regularizer" : 1,
+                "slider_mirror" : 1
             }
         },
         "tvsize" : {
@@ -201,7 +207,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 3
+                "stream_regularizer" : 3,
+                "slider_mirror" : 1
             }
         },
         "hard" : {
@@ -221,14 +228,15 @@ def load_pretrained_model(model_name):
                 "c_false_batch" : 5,
                 "c_randfalse_batch" : 15,
                 "note_distance_basis" : 160,
-                "next_from_slider_end" : False,
+                "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 4,
                 "box_loss_border" : 0.08,
                 "box_loss_value" : 0.15,
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 3
+                "stream_regularizer" : 3,
+                "slider_mirror" : 1
             }
         },
         "normal" : {
@@ -255,7 +263,8 @@ def load_pretrained_model(model_name):
                 "box_loss_weight" : 1
             },
             "modding" : {
-                "stream_regularizer" : 0
+                "stream_regularizer" : 0,
+                "slider_mirror" : 1
             }
         }
     };
