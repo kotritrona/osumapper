@@ -177,7 +177,7 @@ def load_pretrained_model(model_name):
                 "box_loss_border" : 0.1,
                 "box_loss_value" : 0.25,
                 "box_loss_weight" : 1
-            }},
+            },
             "modding" : {
                 "stream_regularizer" : 1,
                 "slider_mirror" : 1
