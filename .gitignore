@@ -17,8 +17,9 @@ v*.*/audio.mp3
 v*.*/*.osu
 
 # model
-# flow_dataset.npz
-# saved_rhythm_model
+v*.*/flow_dataset.npz
+v*.*/saved_rhythm_model
+v*.*/hs_dataset.npz
 # saved_rhythm_model_momentums
 # saved_slider_model1
 # saved_slider_model2
