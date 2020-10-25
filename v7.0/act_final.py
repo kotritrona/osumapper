@@ -7,11 +7,14 @@
 import re, json, datetime;
 from os_tools import *;
 
-def convert_to_osu_obj(obj_array, data):
+def convert_to_osu_obj(obj_array, data, hitsounds=None):
     """
     Converts map data from python format to json format.
     """
     objs, predictions, ticks, timestamps, is_slider, is_spinner, is_note_end, sv, slider_ticks, dist_multiplier, slider_types, slider_length_base = data;
+
+    if hitsounds is None:
+        hitsounds = [0] * len(obj_array);
 
     output = [];
     for i, obj in enumerate(obj_array):
@@ -21,7 +24,7 @@ def convert_to_osu_obj(obj_array, data):
                 "y": int(obj[1]),
                 "type": 1,
                 "time": int(timestamps[i]),
-                "hitsounds": 0,
+                "hitsounds": int(hitsounds[i]),
                 "extHitsounds": "0:0:0",
                 "index": i
             };
@@ -31,7 +34,7 @@ def convert_to_osu_obj(obj_array, data):
                 "y": int(obj[1]),
                 "type": 2,
                 "time": int(timestamps[i]),
-                "hitsounds": 0,
+                "hitsounds": int(hitsounds[i]),
                 "extHitsounds": "0:0:0",
                 "sliderGenerator": {
                     "type": int(slider_types[i]),
@@ -57,11 +60,11 @@ def get_osu_file_name(metadata):
     outname = re.sub("[^a-zA-Z0-9\(\)\[\] \.\,\!\~\`\{\}\-\_\=\+\&\^\@\#\$\%\;\']","", outname);
     return outname;
 
-def step8_save_osu_file(osu_map, data):
+def step8_save_osu_file(osu_map, data, hitsounds=None):
     """
     Save trained map to disk, using filename generated from its metadata.
     """
-    osu_obj_array = convert_to_osu_obj(osu_map, data);
+    osu_obj_array = convert_to_osu_obj(osu_map, data, hitsounds=hitsounds);
 
     with open("mapthis.json", encoding="utf-8") as map_json:
         map_dict = json.load(map_json);

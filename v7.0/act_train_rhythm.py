@@ -231,8 +231,8 @@ class PrintDot(keras.callbacks.Callback):
         print('.', end='')
 
 def step2_build_model():
-    model = build_model();
-    return model;
+    model_v7 = build_model();
+    return model_v7;
 
 
 def step2_train_model(model, PARAMS):

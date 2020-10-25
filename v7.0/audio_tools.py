@@ -9,6 +9,7 @@ import re, os, subprocess, json;
 import numpy as np;
 from os_tools import *;
 from map_analyze import *;
+from hitsound_tools import *;
 
 # It will always fail. Soundfile doesn't support mp3
 import warnings;
@@ -162,9 +163,15 @@ def read_and_save_osu_file(path, filename = "saved", divisor=4):
     # a bit of copypaste code because I changed the data structure many times here
     transformed_data = get_transformed_lst_data(data);
 
-    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
+    # read hitsounds from circles for taiko mode
+    hs_data = get_circle_hitsounds(osu_dict, divisor=divisor);
+
+    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data, hs = hs_data);
 
 def read_and_save_timestamps(path, filename = "saved", divisor=4):
+    """
+    Only used in debugging
+    """
     osu_dict, wav_file = read_osu_file(path, convert = True);
     data, flow_data = get_map_notes(osu_dict, divisor=divisor);
     timestamps = [c[1] for c in data];
@@ -172,6 +179,9 @@ def read_and_save_timestamps(path, filename = "saved", divisor=4):
         json.dump(np.array(timestamps).tolist(), json_file);
 
 def read_and_save_osu_file_using_json_wavdata(path, json_path, filename = "saved", divisor=4):
+    """
+    Only used in debugging
+    """
     osu_dict, wav_file = read_osu_file(path, convert = True);
     data, flow_data = get_map_notes(osu_dict, divisor=divisor);
     with open(json_path) as wav_json:
@@ -183,7 +193,10 @@ def read_and_save_osu_file_using_json_wavdata(path, json_path, filename = "saved
     # a bit of copypaste code because I changed the data structure many times here
     transformed_data = get_transformed_lst_data(data);
 
-    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data);
+    # read hitsounds from circles for taiko mode
+    hs_data = get_circle_hitsounds(osu_dict, divisor=divisor);
+
+    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data, hs = hs_data);
 
 def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.json", divisor=4):
     osu_dict, wav_file = read_osu_file(path, convert = True, json_name=json_name);

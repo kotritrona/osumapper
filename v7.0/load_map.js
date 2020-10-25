@@ -1305,8 +1305,10 @@ function main()
              *
              * - because we can do this the easy way!
              */
-            json.obj = makeClaps(11, json.obj);
-            json.obj = makeClaps(1, json.obj);
+            if(json.obj.every(item => item.hitsounds == 0)) { // Skip hitsounding if it is already hitsounded
+                json.obj = makeClaps(11, json.obj);
+                json.obj = makeClaps(1, json.obj);
+            }
 
             // this will overwrite it if it existed!!
             fs.writeFileSync(outputfile, buildOsuFile(json), {encoding: "utf8"});

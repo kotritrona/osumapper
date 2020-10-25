@@ -35,7 +35,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2,
                 "box_loss_border" : 0.15,
-                "box_loss_value" : 0.3,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -62,8 +62,8 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 360,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 1,
-                "box_loss_border" : 0.08,
-                "box_loss_value" : 0.15,
+                "box_loss_border" : 0.1,
+                "box_loss_value" : 0.35,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -77,21 +77,21 @@ def load_pretrained_model(model_name):
             "rhythm_param" : [1, 0.37, 0.15, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
-                "good_epoch" : 6,
-                "max_epoch" : 20,
+                "good_epoch" : 12,
+                "max_epoch" : 30,
                 "note_group_size" : 10,
-                "g_epochs" : 7,
-                "c_epochs" : 3,
+                "g_epochs" : 1,
+                "c_epochs" : 1,
                 "g_batch" : 50,
                 "g_input_size" : 50,
-                "c_true_batch" : 90,
-                "c_false_batch" : 7,
-                "c_randfalse_batch" : 3,
+                "c_true_batch" : 140,
+                "c_false_batch" : 5,
+                "c_randfalse_batch" : 5,
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 1,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.25,
+                "box_loss_value" : 0.35,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -118,7 +118,7 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 180,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 1,
-                "box_loss_border" : 0.2,
+                "box_loss_border" : 0.1,
                 "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
@@ -146,8 +146,8 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2,
-                "box_loss_border" : 0.08,
-                "box_loss_value" : 0.15,
+                "box_loss_border" : 0.1,
+                "box_loss_value" : 0.25,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -161,23 +161,23 @@ def load_pretrained_model(model_name):
             "rhythm_param" : [1, 0.55, 0.25, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
-                "good_epoch" : 8,
-                "max_epoch" : 25,
+                "good_epoch" : 12,
+                "max_epoch" : 30,
                 "note_group_size" : 10,
-                "g_epochs" : 7,
-                "c_epochs" : 3,
+                "g_epochs" : 1,
+                "c_epochs" : 1,
                 "g_batch" : 50,
                 "g_input_size" : 50,
-                "c_true_batch" : 50,
+                "c_true_batch" : 140,
                 "c_false_batch" : 5,
-                "c_randfalse_batch" : 15,
-                "note_distance_basis" : 300,
+                "c_randfalse_batch" : 5,
+                "note_distance_basis" : 320,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 1,
-                "box_loss_border" : 0.08,
-                "box_loss_value" : 0.15,
+                "box_loss_border" : 0.1,
+                "box_loss_value" : 0.25,
                 "box_loss_weight" : 1
-            },
+            }},
             "modding" : {
                 "stream_regularizer" : 1,
                 "slider_mirror" : 1
@@ -202,8 +202,8 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2,
-                "box_loss_border" : 0.08,
-                "box_loss_value" : 0.24,
+                "box_loss_border" : 0.15,
+                "box_loss_value" : 0.35,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -231,7 +231,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 4,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.2,
+                "box_loss_value" : 0.25,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -258,8 +258,8 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 100,
                 "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 8,
-                "box_loss_border" : 0.08,
-                "box_loss_value" : 0.15,
+                "box_loss_border" : 0.1,
+                "box_loss_value" : 0.25,
                 "box_loss_weight" : 1
             },
             "modding" : {

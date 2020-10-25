@@ -576,6 +576,15 @@ def generate_map():
     a = np.concatenate(o, axis=0);
     return a;
 
+def put_everything_in_the_center():
+    o = [];
+    print("max_epoch = 0: putting everyting in the center")
+    for i in range(timestamps.shape[0]):
+        z = [256, 192, 0, 0, 256 + slider_lengths[i], 192]
+        o.append(z)
+    a = np.array(o);
+    return a;
+
 def generate_test():
     """
     This is only used in debugging.
@@ -660,6 +669,10 @@ def step6_run_all(flow_dataset_npz = "flow_dataset.npz"):
 
     plot_noise = np.random.random((1, GAN_PARAMS["g_input_size"]));
 
-    osu_a = generate_map();
+    if GAN_PARAMS["max_epoch"] == 0:
+        osu_a = put_everything_in_the_center();
+    else:
+        osu_a = generate_map();
+
     data = objs, predictions, ticks, timestamps, is_slider, is_spinner, is_note_end, sv, slider_ticks, dist_multiplier, slider_types, slider_length_base;
     return osu_a, data;

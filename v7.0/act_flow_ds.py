@@ -51,3 +51,29 @@ def step3_read_maps_flow(params):
 
 def step3_save_flow_dataset(maps_flow):
     np.savez_compressed("flow_dataset", maps = maps_flow);
+
+def read_map_npz_hs(file_path):
+    with np.load(file_path) as data:
+        hs_data = data["hs"];
+    return hs_data;
+
+def step3_read_maps_hs(params):
+    result_avail_flags = [];
+    result_hitsounds = [];
+    for file in os.listdir(root):
+        if file.endswith(".npz"):
+            hs_data = read_map_npz_hs(os.path.join(root, file));
+
+            avail_flags = hs_data[:, 0]
+            hitsounds = hs_data[:, 1:]
+
+            result_avail_flags.append(avail_flags)
+            result_hitsounds.append(hitsounds)
+
+    af = np.concatenate(result_avail_flags, axis=0)
+    hs = np.concatenate(result_hitsounds, axis=0)
+
+    return af[af != 0], hs[af != 0]
+
+def step3_save_hs_dataset(hs_avail_flags, hs):
+    np.savez_compressed("hs_dataset", avail_flags = hs_avail_flags, hs = hs);
