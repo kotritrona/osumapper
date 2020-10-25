@@ -15,5 +15,6 @@ def step8_apply_taiko_hitsounds(obj_array, data, hs_dataset="hs_dataset.npz", pa
 
     hs_avail_flags, hs_data = read_hitsound_dataset(hs_dataset)
     hitsounds = apply_hitsounds(hs_avail_flags, hs_data, ticks, divisor=divisor, metronome_count=metronome_count)
+    hitsounds = fix_taiko_big_drum(ticks, hitsounds)
 
     return hitsounds

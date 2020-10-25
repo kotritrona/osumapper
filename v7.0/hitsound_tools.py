@@ -136,3 +136,14 @@ def apply_hitsounds(hs_avail_flags, hs_data, ticks, divisor=4, metronome_count=4
     hs_objs = hs_full[ticks]
 
     return hs_objs
+
+def fix_taiko_big_drum(ticks, hitsounds):
+    """
+    Remove finishes when there is another note next tick
+    """
+    for i,tick in enumerate(ticks):
+        if tick+1 in ticks:
+            if hitsounds[i] & 4 == 4: # has finish hitsound == big drum
+                hitsounds[i] -= 4
+
+    return hitsounds
