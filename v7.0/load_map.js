@@ -1276,7 +1276,7 @@ function generateSlider(slider) {
     _rsp = [st.type].concat(points.map(a => a.join(":")));
 
     slider.sliderReverses = st.repeats;
-    slider.sliderLength = Math.round(g.len);
+    slider.sliderLength = g.len;
     slider.sliderSingleHitsounds = [];
     slider.sliderExtHitsounds = [];
     slider.sliderData = analyzeSlider({
