@@ -630,17 +630,24 @@ def step6_run_all(flow_dataset_npz = "flow_dataset.npz"):
     # e.g. SV 1.6, timing section x1.00, 1/4 divisor, then slider_length_base = 40
     slider_length_base = sv / divisor;
 
+    # weight for each type of sliders
+    slider_type_probs = [0.25, 0.25, 0.25, 0.05, 0.05, 0.03, 0.03, 0.01, 0.01, 0.005, 0.005, 0.005, 0.005, 0.005, 0.005, 0.015, 0.015, 0.01];
+    slider_types = np.random.choice(len(slider_type_probs), is_slider.shape, p=slider_type_probs).astype(int);
+
     # these data must be kept consistent with the sliderTypes in load_map.js
-    slider_types = np.random.randint(0, 5, is_slider.shape).astype(int); # needs to determine the slider types!! also it is 5!!!
-    slider_type_rotation = np.array([0, -0.40703540572409336, 0.40703540572409336, -0.20131710837464062, 0.20131710837464062]);
+    slider_type_rotation = np.array([0, -0.40703540572409336, 0.40703540572409336, -0.20131710837464062, 0.20131710837464062,
+        -0.46457807316944644, 0.46457807316944644, 1.5542036732051032, -1.5542036732051032, 0, 0, 0.23783592745745077, -0.23783592745745077,
+        0.5191461142465229, -0.5191461142465229, -0.16514867741462683, 0.16514867741462683, 3.141592653589793]);
+
+    # this is vector length! I should change the variable name probably...
+    slider_type_length = np.array([1.0, 0.97, 0.97, 0.97, 0.97, 0.97, 0.97, 0.64, 0.64, 0.94, 0.94, 0.94, 0.94, 0.94, 0.94, 0.96, 0.96, 0]);
+
     slider_cos = np.cos(slider_type_rotation);
     slider_sin = np.sin(slider_type_rotation);
 
     slider_cos_each = slider_cos[slider_types];
     slider_sin_each = slider_sin[slider_types];
 
-    # this is vector length! I should change the variable name probably...
-    slider_type_length = np.array([1.0, 0.97, 0.97, 0.97, 0.97]);
 
     slider_lengths = np.array([slider_type_length[int(k)] * slider_length_base[i] for i, k in enumerate(slider_types)]) * slider_ticks;
 

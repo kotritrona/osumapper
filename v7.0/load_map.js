@@ -872,7 +872,7 @@ function calculateBezierData(beziers, totalLen) {
                     len: partLen
                 });
                 remlen -= partLen;
-                if(remlen <= 0) {
+                if(remlen < 0.5) {
                     lastTangent = getPolyTangent(bezierPoly, 1);
                 }
             }
@@ -885,7 +885,12 @@ function calculateBezierData(beziers, totalLen) {
                     points: bezier,
                     len: remlen
                 });
-                lastTangent = getPolyTangent(bezierPoly, 1);
+                if(partLen > 0) {
+                    lastTangent = getPolyTangent(bezierPoly, remlen / partLen);
+                }
+                else {
+                    lastTangent = getPolyTangent(bezierPoly, 1);
+                }
                 remlen = -99;
                 break;
             }
@@ -1129,6 +1134,110 @@ function getAllSliderTypes() {
         repeats: 1,
         angle: 0.20131710837464062,
         points: [[0.48, -0.1], [0.48, -0.1], [0.97, 0]]
+    }, {
+        index: 5,
+        name: "wave-cw",
+        type: "B",
+        vecLength: 0.97,
+        repeats: 1,
+        angle: -0.46457807316944644,
+        points: [[0.38, -0.2], [0.58, 0.2], [0.97, 0]]
+    }, {
+        index: 6,
+        name: "wave-ccw",
+        type: "B",
+        vecLength: 0.97,
+        repeats: 1,
+        angle: 0.46457807316944644,
+        points: [[0.38, 0.2], [0.58, -0.2], [0.97, 0]]
+    }, {
+        index: 7,
+        name: "halfcircle-cw",
+        type: "P",
+        vecLength: 0.64,
+        repeats: 1,
+        angle: 1.5542036732051032,
+        points: [[0.32, -0.32], [0.64, 0]]
+    }, {
+        index: 8,
+        name: "halfcircle-ccw",
+        type: "P",
+        vecLength: 0.64,
+        repeats: 1,
+        angle: -1.5542036732051032,
+        points: [[0.32, 0.32], [0.64, 0]]
+    }, {
+        index: 9,
+        name: "haneru-cw",
+        type: "B",
+        vecLength: 0.94,
+        repeats: 1,
+        angle: 0,
+        points: [[0.24, -0.08], [0.44, -0.04], [0.64, 0.1], [0.64, 0.1], [0.76, 0], [0.94, 0]]
+    }, {
+        index: 10,
+        name: "haneru-ccw",
+        type: "B",
+        vecLength: 0.94,
+        repeats: 1,
+        angle: 0,
+        points: [[0.24, 0.08], [0.44, 0.04], [0.64, -0.1], [0.64, -0.1], [0.76, 0], [0.94, 0]]
+    }, {
+        index: 11,
+        name: "elbow-cw",
+        type: "B",
+        vecLength: 0.94,
+        repeats: 1,
+        angle: 0.23783592745745077,
+        points: [[0.28, -0.16], [0.28, -0.16], [0.94, 0]]
+    }, {
+        index: 12,
+        name: "elbow-ccw",
+        type: "B",
+        vecLength: 0.94,
+        repeats: 1,
+        angle: -0.23783592745745077,
+        points: [[0.28, 0.16], [0.28, 0.16], [0.94, 0]]
+    }, {
+        index: 13,
+        name: "ankle-cw",
+        type: "B",
+        vecLength: 0.94,
+        repeats: 1,
+        angle: 0.5191461142465229,
+        points: [[0.66, -0.16], [0.66, -0.16], [0.94, 0]]
+    }, {
+        index: 14,
+        name: "ankle-ccw",
+        type: "B",
+        vecLength: 0.94,
+        repeats: 1,
+        angle: -0.5191461142465229,
+        points: [[0.66, 0.16], [0.66, 0.16], [0.94, 0.0]]
+    }, {
+        index: 15,
+        name: "bolt-cw",
+        type: "B",
+        vecLength: 0.96,
+        repeats: 1,
+        angle: -0.16514867741462683,
+        points: [[0.34, -0.06], [0.34, -0.06], [0.6, 0.06], [0.6, 0.06], [0.96, 0.0]]
+    }, {
+        index: 16,
+        name: "bolt-ccw",
+        type: "B",
+        vecLength: 0.96,
+        repeats: 1,
+        angle: 0.16514867741462683,
+        points: [[0.34, 0.06], [0.34, 0.06], [0.6, -0.06], [0.6, -0.06], [0.96, 0.0]]
+    }, {
+        index: 17,
+        name: "linear-reverse",
+        type: "L",
+        vecLength: 0,
+        repeats: 2,
+        angle: 3.141592653589793,
+        points: [[0.0, 0.0], [0.5, 0.0]]
     }];
 }
 
@@ -1149,6 +1258,9 @@ function generateSlider(slider) {
 
     var g = slider.sliderGenerator;
     var st = sliderTypes[g.type];
+
+    g.len /= st.repeats;
+
     var dOutAngle = Math.atan2(g.dOut[1], g.dOut[0]);
     var targetAngle = dOutAngle - st.angle;
     var points = [];
@@ -1164,7 +1276,7 @@ function generateSlider(slider) {
     _rsp = [st.type].concat(points.map(a => a.join(":")));
 
     slider.sliderReverses = st.repeats;
-    slider.sliderLength = g.len;
+    slider.sliderLength = Math.round(g.len);
     slider.sliderSingleHitsounds = [];
     slider.sliderExtHitsounds = [];
     slider.sliderData = analyzeSlider({

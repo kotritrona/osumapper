@@ -299,7 +299,7 @@ def load_pretrained_model(model_name):
         "catch" : {
             "rhythm_model" : "models/catch/rhythm_model",
             "flow_dataset" : "models/catch/flow_dataset.npz",
-            "rhythm_param" : [1, 0.5, 0, [0, 0, 0, 0], 8],
+            "rhythm_param" : [1, 0.35, 0, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,
                 "good_epoch" : 15,
@@ -310,8 +310,8 @@ def load_pretrained_model(model_name):
                 "g_batch" : 50,
                 "g_input_size" : 50,
                 "c_true_batch" : 130,
-                "c_false_batch" : 5,
-                "c_randfalse_batch" : 15,
+                "c_false_batch" : 10,
+                "c_randfalse_batch" : 10,
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 0,
