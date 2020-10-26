@@ -203,8 +203,11 @@ def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.j
     sig, samplerate = librosa.load(wav_file, sr=None, mono=True);
     file_len = (sig.shape[0] / samplerate * 1000 - 3000);
 
-    timestamps, tick_lengths, slider_lengths = get_all_ticks_and_lengths_from_ts(osu_dict["timing"]["uts"], osu_dict["timing"]["ts"], file_len, divisor=divisor);
-    ticks = np.array([i for i,k in enumerate(timestamps)]);
+    # ticks = ticks from each uninherited timing section
+    ticks, timestamps, tick_lengths, slider_lengths = get_all_ticks_and_lengths_from_ts(osu_dict["timing"]["uts"], osu_dict["timing"]["ts"], file_len, divisor=divisor);
+
+    # old version to determine ticks (all from start)
+    # ticks = np.array([i for i,k in enumerate(timestamps)]);
     extra = np.array([60000 / tick_lengths, slider_lengths]);
 
     wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);

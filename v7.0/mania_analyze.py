@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# JSON osu! map analysis
+# JSON osu! map analysis (for osu!mania)
 #
 
 import numpy as np;
@@ -50,10 +50,10 @@ def get_slider_len_ts(ts_a, tick):
 def get_end_time(note):
     if note["type"] & 8:
         return note["spinnerEndTime"];
-    elif note["type"] & 2:
-        return note["sliderData"]["endTime"];
-    #elif note["type"] & 128:
-    #    return note["holdEndTime"];
+    # elif note["type"] & 2:
+    #     return note["sliderData"]["endTime"];
+    elif note["type"] & 128:
+       return note["holdEndTime"];
     else:
         return note["time"];
 
@@ -119,7 +119,7 @@ def get_map_notes(map_json, **kwargs):
     Reads JSON map data and creates a list for every tick
     Returns:
         data = list of data array: [TICK, TIME, NOTE, NOTE_TYPE, SLIDING, SPINNING, MOMENTUM, Ex1, Ex2, Ex3]
-        flow_data = list of data array: [i, tick, note_type, x, y, vec_in_x, vec_in_y, vec_out_x, vec_out_y, end_x, end_y]
+        mania_data = note groups like the hitsounds in taiko
 
     Ex1, Ex2, Ex3 = tickLength/500, BPM/120, sliderLength/150
     """
@@ -133,10 +133,8 @@ def get_map_notes(map_json, **kwargs):
     def get_note_type(obj):
         if not obj:
             return 0;
-        if obj["type"] & 2:
-            return 2;
-        elif obj["type"] & 8:
-            return 3;
+        if obj["type"] & 128:
+            return 4;
         return 1;
 
     po = 0;

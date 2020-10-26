@@ -116,8 +116,9 @@ function reparseDiffdata(ds)
 	return o;
 }
 
-function parseHitObjects(hitObjs)
+function parseHitObjects(hitObjs, gameMode)
 {
+    gameMode = gameMode || 0;
     var hitObjectArray = [];
 	for(var i=0;i<hitObjs.length;i++)
 	{
@@ -167,6 +168,12 @@ function parseHitObjects(hitObjs)
         {
             v.spinnerEndTime = parseInt(j[5], 10);
             v.extHitsounds = j[6];
+        }
+        else if(gameMode == 3 && v.type & 128)
+        {
+            let maniaHoldData = j[5].split(":");
+            v.holdEndTime = parseInt(maniaHoldData[0], 10);
+            v.extHitsounds = maniaHoldData.slice(1).join(":");
         }
 		else
 		{
@@ -240,6 +247,20 @@ function reparseHitObjects(hitObjectArray)
             if(v.extHitsounds)
             {
                 j += "," + v.extHitsounds;
+            }
+        }
+        else if(v.type & 128)
+        {
+            if(v.extHitsounds)
+            {
+                if(v.holdEndTime)
+                {
+                    j += "," + v.holdEndTime + ":" + v.extHitsounds;
+                }
+                else
+                {
+                    j += "," + v.extHitsounds;
+                }
             }
         }
 		else
@@ -644,16 +665,19 @@ function load_map(txt)
 
 	hitObjs = objectsData.replace(/(\r?\n)+$/,"").split(/\r?\n/i);
 
+    let generalParsed = parseGeneral(generalLines)
+    let gameMode = generalParsed["Mode"] || 0;
+
     var mapObj = {
         fileVersion: fileVersion,
-        general: parseGeneral(generalLines),
+        general: generalParsed,
         editor: editorData,
         meta: parseMeta(metaData),
         diff: parseDiffdata(diffData),
         evt: eventsData,
         timing: parseTimeSections(timingSectionData),
         color: colorsData,
-        obj: parseHitObjects(hitObjs)
+        obj: parseHitObjects(hitObjs, gameMode)
     };
 	return mapObj;
 }
@@ -1389,7 +1413,7 @@ function main()
             // this will overwrite it if it existed!!
             fs.writeFileSync(outputfile, buildOsuFile(json), {encoding: "utf8"});
             if(mode2 != "q") {
-                output("success! file converted to json.");
+                output("success! file converted to osu map.");
             }
         }
         catch(e) {
@@ -1425,7 +1449,7 @@ function main()
             // this will overwrite it if it existed!!
             fs.writeFileSync(outputfile, buildOsuFile(json), {encoding: "utf8"});
             if(mode2 != "q") {
-                output("success! file converted to json.");
+                output("success! built osu map from json data.");
             }
         }
         catch(e) {
