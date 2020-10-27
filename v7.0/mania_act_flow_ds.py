@@ -52,32 +52,6 @@ def step3_read_maps_flow(params):
 def step3_save_flow_dataset(maps_flow):
     np.savez_compressed("flow_dataset", maps = maps_flow);
 
-def read_map_npz_hs(file_path):
-    with np.load(file_path) as data:
-        hs_data = data["hs"];
-    return hs_data;
-
-def step3_read_maps_hs(params):
-    result_avail_flags = [];
-    result_hitsounds = [];
-    for file in os.listdir(root):
-        if file.endswith(".npz"):
-            hs_data = read_map_npz_hs(os.path.join(root, file));
-
-            avail_flags = hs_data[:, 0]
-            hitsounds = hs_data[:, 1:]
-
-            result_avail_flags.append(avail_flags)
-            result_hitsounds.append(hitsounds)
-
-    af = np.concatenate(result_avail_flags, axis=0)
-    hs = np.concatenate(result_hitsounds, axis=0)
-
-    return af[af != 0], hs[af != 0]
-
-def step3_save_hs_dataset(hs_avail_flags, hs):
-    np.savez_compressed("hs_dataset", avail_flags = hs_avail_flags, hs = hs);
-
 def read_map_npz_pattern(file_path):
     with np.load(file_path) as data:
         pattern_data = data["pattern"];
@@ -87,21 +61,18 @@ def array_to_flags(arr):
     return sum([k*2**i for i,k in enumerate(arr)])
 
 def step3_read_maps_pattern(params):
-    pattern_length = -1
-    result_avail_note_begin = [[] for i in range(10)];
-    result_avail_note_end = [[] for i in range(10)];
-    result_avail_hold = [[] for i in range(10)];
-    result_pattern_note_begin = [[] for i in range(10)];
-    result_pattern_note_end = [[] for i in range(10)];
+    result_avail_note_begin = [[]] * 10;
+    result_avail_note_end = [[]] * 10;
+    result_avail_hold = [[]] * 10;
+    result_pattern_note_begin = [[]] * 10;
+    result_pattern_note_end = [[]] * 10;
     for file in os.listdir(root):
         if file.endswith(".npz"):
-            pattern_data = read_map_npz_pattern(os.path.join(root, file));
+            pattern_data = read_map_npz_hs(os.path.join(root, file));
 
             try:
                 key_count = (pattern_data.shape[2] - 1) // 2
                 key_index = key_count - 1
-
-                pattern_length = pattern_data.shape[1]
 
                 avail_hold = pattern_data[:, :, 0]
                 pattern_note_begin = pattern_data[:, :, 1:1+key_count]
@@ -120,13 +91,7 @@ def step3_read_maps_pattern(params):
 
     outdata = []
 
-    if pattern_length == -1:
-        pattern_length = 16
-
     for key_index in range(10):
-        if len(result_avail_note_begin[key_index]) == 0:
-            outdata.append([np.array([]), np.array([]), np.array([]), np.zeros((0, pattern_length, 1 + key_index)), np.zeros((0, pattern_length, 1 + key_index))])
-            continue
         anb = np.concatenate(result_avail_note_begin[key_index], axis=0)
         ane = np.concatenate(result_avail_note_end[key_index], axis=0)
         ah = np.concatenate(result_avail_hold[key_index], axis=0)

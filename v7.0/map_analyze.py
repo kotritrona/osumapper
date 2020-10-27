@@ -114,6 +114,14 @@ def get_momentum(note, prev_note, slider_len):
     start_type_momentum = np.sqrt(v3.dot(v3)) / (note["time"] - prev_note["time"]) / slider_len;
     return np.min([end_type_momentum, start_type_momentum]);
 
+def is_uts_begin(map_json, tick):
+    uts_a =  map_json["timing"]["uts"];
+    begin_times = [uts["beginTime"] for uts in uts_a];
+    for t in begin_times:
+        if tick > t - 1 and tick < t + 5:
+            return True
+    return False
+
 def get_map_notes(map_json, **kwargs):
     """
     Reads JSON map data and creates a list for every tick
@@ -130,6 +138,7 @@ def get_map_notes(map_json, **kwargs):
     objs = map_json["obj"];
     obj_times = list(map(lambda obj: obj["time"], objs));
 
+    # 1 for circle, 2 for slider, 3 for spinner
     def get_note_type(obj):
         if not obj:
             return 0;
@@ -150,6 +159,7 @@ def get_map_notes(map_json, **kwargs):
     data = [];
     flow_data = [];
 
+    # constant multipliers and subtractions
     tlen_mp = 1/500;
     tlen_s = 1;
     bpm_mp = 1/120;
@@ -157,9 +167,18 @@ def get_map_notes(map_json, **kwargs):
     slen_mp = 1/150;
     slen_s = 1;
 
+    # tick count from start of uninherited timing section
+    uts_i = 0;
+
+    # tick is timestamp here
     for i, tick in enumerate(tick_times):
 
-        # Attach extra vars at the end of each note datum
+        if is_uts_begin(map_json, tick):
+            uts_i = 0;
+        else:
+            uts_i += 1;
+
+        # Attach extra vars at the end of each note data row
         tlen = get_tick_len(map_json, tick);
         bpm = 60000 / tlen;
         slen = get_slider_len(map_json, tick);
@@ -193,7 +212,7 @@ def get_map_notes(map_json, **kwargs):
 
             # end point
             endpoint = get_end_point(objs[po]);
-            flow_data.append([i, tick, note_type, objs[po]["x"], objs[po]["y"], input_vector[0], input_vector[1], output_vector[0], output_vector[1], endpoint[0], endpoint[1]]);
+            flow_data.append([uts_i, tick, note_type, objs[po]["x"], objs[po]["y"], input_vector[0], input_vector[1], output_vector[0], output_vector[1], endpoint[0], endpoint[1]]);
 
             # put data
             if note_type == 1:
@@ -209,20 +228,20 @@ def get_map_notes(map_json, **kwargs):
                 last_obj_time = spinner_end_time;
 
             # TICK, TIME, NOTE, NOTE_TYPE, SLIDING, SPINNING, MOMENTUM, Ex1, Ex2, Ex3
-            data.append([i, tick, 1, note_type, sliding, spinning, momentum, ex1, ex2, ex3]);
+            data.append([uts_i, tick, 1, note_type, sliding, spinning, momentum, ex1, ex2, ex3]);
         elif spinning == 1:
             if tick >= spinner_end_time - 5:
                 spinning = 0;
-                data.append([i, tick, 1, 5, 0, 0, 0, ex1, ex2, ex3]);
+                data.append([uts_i, tick, 1, 5, 0, 0, 0, ex1, ex2, ex3]);
             else:
-                data.append([i, tick, 0, 0, 0, 1, 0, ex1, ex2, ex3]);
+                data.append([uts_i, tick, 0, 0, 0, 1, 0, ex1, ex2, ex3]);
         elif sliding == 1:
             if tick >= slider_end_time - 5:
                 sliding = 0;
-                data.append([i, tick, 1, 4, 0, 0, 0, ex1, ex2, ex3]);
+                data.append([uts_i, tick, 1, 4, 0, 0, 0, ex1, ex2, ex3]);
             else:
-                data.append([i, tick, 0, 0, 1, 0, 0, ex1, ex2, ex3]);
+                data.append([uts_i, tick, 0, 0, 1, 0, 0, ex1, ex2, ex3]);
         else: # not found
             if tick - last_obj_time < note_max_wait_time and tick >= start_time:
-                data.append([i, tick, 0, 0, 0, 0, 0, ex1, ex2, ex3]);
+                data.append([uts_i, tick, 0, 0, 0, 0, 0, ex1, ex2, ex3]);
     return data, flow_data;

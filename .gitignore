@@ -20,6 +20,7 @@ v*.*/*.osu
 v*.*/flow_dataset.npz
 v*.*/saved_rhythm_model
 v*.*/hs_dataset.npz
+v*.*/mania_pattern_dataset.npz
 # saved_rhythm_model_momentums
 # saved_slider_model1
 # saved_slider_model2

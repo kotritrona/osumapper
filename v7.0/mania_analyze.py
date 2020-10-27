@@ -53,7 +53,7 @@ def get_end_time(note):
     # elif note["type"] & 2:
     #     return note["sliderData"]["endTime"];
     elif note["type"] & 128:
-       return note["holdEndTime"];
+        return note["holdEndTime"];
     else:
         return note["time"];
 
@@ -68,86 +68,42 @@ def get_all_ticks_and_lengths_from_ts(uts_array, ts_array, end_time, divisor=4):
     slider_len = [get_slider_len_ts(ts_array, timestamp) for timestamp in np.concatenate(timestamps)];
     return np.concatenate(ticks_from_uts), np.round(np.concatenate(timestamps)).astype(int), np.concatenate(tick_len), np.array(slider_len);
 
-def get_end_point(note):
-    if note["type"] & 8:
-        return np.array([256, 192]);
-    elif note["type"] & 2:
-        return np.array(note["sliderData"]["endpoint"]);
-    else:
-        return np.array([note["x"], note["y"]]);
+def is_uts_begin(map_json, tick):
+    uts_a =  map_json["timing"]["uts"];
+    begin_times = [uts["beginTime"] for uts in uts_a];
+    for t in begin_times:
+        if tick > t - 1 and tick < t + 5:
+            return True
+    return False
 
-def get_input_vector(note, prev_note):
-    if note["type"] & 8:
-        return None;
-    #elif note["type"] & 2:
-    #    return np.array(note["sliderData"]["dIn"]);
-    else:
-        vec = np.array([note["x"], note["y"]]) - get_end_point(prev_note);
-        return vec / max(0.001, np.sqrt(vec.dot(vec)));
+def get_metronome_count(map_json, tick):
+    uts_a = map_json["timing"]["uts"];
+    if tick < uts_a[0]["beginTime"]:
+        return uts_a[0]["whiteLines"];
+    for uts in reversed(uts_a):
+        if tick >= uts["beginTime"]:
+            return uts["whiteLines"];
 
-def get_output_vector(note, prev_note):
-    if note["type"] & 8:
-        return None;
-    elif note["type"] & 2:
-        return np.array(note["sliderData"]["dOut"]);
-    else:
-        vec = np.array([note["x"], note["y"]]) - get_end_point(prev_note);
-        return vec / max(0.001, np.sqrt(vec.dot(vec)));
-
-def get_momentum(note, prev_note, slider_len):
-    """
-    momentum = distance snap (distance / slider length).
-    for sliders, takes small value between from slider end or slider start to next note.
-    """
-    v1 = np.array([note["x"], note["y"]]);
-    v0 = get_end_point(prev_note);
-    v = v1 - v0;
-    if note["time"] - get_end_time(prev_note) == 0 or note["time"] - prev_note["time"] == 0:
-        # it has the same time the previous note ends. either a bugged sliderend or a double note
-        return 0;
-    end_type_momentum = np.sqrt(v.dot(v)) / (note["time"] - get_end_time(prev_note)) / slider_len;
-
-    # Since slider jumps in maps cause parameters to be learned too high
-    # we try to deal with slider leniency by using the beginning of slider
-    v2 = np.array([prev_note["x"], prev_note["y"]]);
-    v3 = v1 - v2;
-    start_type_momentum = np.sqrt(v3.dot(v3)) / (note["time"] - prev_note["time"]) / slider_len;
-    return np.min([end_type_momentum, start_type_momentum]);
-
-def get_map_notes(map_json, **kwargs):
+def get_map_notes_and_patterns(map_json, **kwargs):
     """
     Reads JSON map data and creates a list for every tick
     Returns:
         data = list of data array: [TICK, TIME, NOTE, NOTE_TYPE, SLIDING, SPINNING, MOMENTUM, Ex1, Ex2, Ex3]
-        mania_data = note groups like the hitsounds in taiko
+        patterns = numpy array shape (num_groups, main_metronome * divisor, 2 * key_count + 1)
+                   [:, :, 0] pattern_avail_hold
+                   [:, :, 1:1+key_count] pattern_note_begin
+                   [:, :, 1+key_count:1+2*key_count] pattern_note_end
 
     Ex1, Ex2, Ex3 = tickLength/500, BPM/120, sliderLength/150
     """
+
+    # keyword arguments
     length = kwargs.get("length", -1);
     divisor = kwargs.get("divisor", 4);
-    tick_times = get_map_timing_array(map_json, length = length, divisor = divisor);
-
-    objs = map_json["obj"];
-    obj_times = list(map(lambda obj: obj["time"], objs));
-
-    def get_note_type(obj):
-        if not obj:
-            return 0;
-        if obj["type"] & 128:
-            return 4;
-        return 1;
-
-    po = 0;
     note_max_wait_time = kwargs.get("note_max_wait_time", 1000);
-    start_time = obj_times[0] - note_max_wait_time;
-    last_obj_time = start_time;
-    sliding = 0;
-    slider_end_time = 0;
-    spinning = 0;
-    spinner_end_time = 0;
-    data = [];
-    flow_data = [];
+    main_metronome = kwargs.get("main_metronome", 4);
 
+    # constant multipliers and subtractions
     tlen_mp = 1/500;
     tlen_s = 1;
     bpm_mp = 1/120;
@@ -155,9 +111,79 @@ def get_map_notes(map_json, **kwargs):
     slen_mp = 1/150;
     slen_s = 1;
 
+    # get the timing array of timestamps of each tick
+    tick_times = get_map_timing_array(map_json, length = length, divisor = divisor);
+
+    objs_all = map_json["obj"];
+    key_count = map_json["diff"]["CS"];
+
+    objs_each = [[] for i in range(key_count)];
+
+    for obj in objs_all:
+        x = obj["x"]
+        obj_key = np.floor(x * key_count / 512).astype(int)
+        objs_each[obj_key].append(obj)
+
+    def get_note_type_mania(obj):
+        if not obj:
+            return 0;
+        if obj["type"] & 128:
+            return 4;
+        return 1;
+
+    # object times each key
+    obj_times_each = []
+    for objs in objs_each:
+        obj_times = [obj["time"] for obj in objs]
+        obj_times_each.append(obj_times)
+
+    # object end times each key
+    obj_end_times_each = []
+    for objs in objs_each:
+        obj_end_times = [get_end_time(obj) for obj in objs]
+        obj_end_times_each.append(obj_end_times)
+
+    obj_ptr_each = [0] * key_count
+    obj_end_ptr_each = [0] * key_count
+
+    po = 0;
+    start_time = obj_times[0] - note_max_wait_time;
+    last_obj_time = start_time;
+
+    holding_each = [0] * key_count
+
+    data = [];
+    pattern_avail_hold = []
+    pattern_data = []
+    pattern_data_end = []
+
+    pattern_avail_hold_grouped = []
+    pattern_data_grouped = []
+    pattern_data_end_grouped = []
+
+    # tick count from start of uninherited timing section
+    uts_i = 0;
+
+    # tick is timestamp here
     for i, tick in enumerate(tick_times):
 
-        # Attach extra vars at the end of each note datum
+        if is_uts_begin(map_json, tick):
+            uts_i = 0;
+        else:
+            uts_i += 1;
+
+        # save group in a metronome when at the start of next metronome
+        metronome = get_metronome_count(map_json, tick)
+        if uts_i % (metronome * divisor) == 0:
+            if len(pattern_data) > 0 and np.sum(pattern_data) > 0 and np.sum(pattern_data_end) > 0:
+                pattern_avail_hold_grouped.append(pattern_avail_hold)
+                pattern_data_grouped.append(pattern_data)
+                pattern_data_end_grouped.append(pattern_data_end)
+            pattern_avail_hold = []
+            pattern_data = []
+            pattern_data_end = []
+
+        # Attach extra vars at the end of each tick date point
         tlen = get_tick_len(map_json, tick);
         bpm = 60000 / tlen;
         slen = get_slider_len(map_json, tick);
@@ -165,62 +191,88 @@ def get_map_notes(map_json, **kwargs):
         ex2 = bpm * bpm_mp - bpm_s;
         ex3 = slen * slen_mp - slen_s;
 
-        while obj_times[po] < tick - 5 and po < len(obj_times) - 1:
-            po += 1;
-        if obj_times[po] >= tick - 5 and obj_times[po] <= tick + 5: # found note
-            last_obj_time = tick;
-            note_type = get_note_type(objs[po]);
+        has_note = False
+        has_note_end = False
+        has_hold = False
 
-            # calculate momentum
-            if po >= 1:
-                momentum = get_momentum(objs[po], objs[po-1], slen/tlen);
+        # list of length (key_count) for pattern on current tick
+        tick_pattern = []
+        tick_pattern_end = []
+        for k in range(key_count):
+            objs = objs_each[k]
+            obj_times = obj_times_each[k]
+            obj_end_times = obj_end_times_each[k]
+
+            # locate pointers
+            while obj_times[obj_ptr_each[k]] < tick - 5 and obj_ptr_each[k] < len(obj_times) - 1:
+                obj_ptr_each[k] += 1;
+            while obj_end_times[obj_end_ptr_each[k]] < tick - 5 and obj_end_ptr_each[k] < len(obj_end_times) - 1:
+                obj_end_ptr_each[k] += 1;
+
+            obj_ptr = obj_ptr_each[k]
+            obj_end_ptr = obj_end_ptr_each[k]
+
+            if obj_times[obj_ptr] >= tick - 5 and obj_times[obj_ptr] <= tick + 5: # found note on key
+                has_note = True
+                note_type = get_note_type_mania(objs[obj_ptr])
+                if note_type == 4:
+                    has_hold = True
+                tick_pattern.append(1)
             else:
-                momentum = 0;
+                tick_pattern.append(0)
 
-            # flow data
-            if po >= 1:
-                input_vector = get_input_vector(objs[po], objs[po-1]);
-                output_vector = get_output_vector(objs[po], objs[po-1]);
+            if obj_end_times[obj_end_ptr] >= tick - 5 and obj_end_times[obj_end_ptr] <= tick + 5: # found note end on key
+                has_note_end = True
+                tick_pattern_end.append(1)
             else:
-                input_vector = [0, 0];
-                output_vector = [0, 0];
-            if input_vector is None or input_vector[0] is None or input_vector[1] is None:
-                input_vector = [0, 0];
-            if output_vector is None or output_vector[0] is None or output_vector[1] is None:
-                output_vector = [0, 0];
+                tick_pattern_end.append(0)
 
-            # end point
-            endpoint = get_end_point(objs[po]);
-            flow_data.append([i, tick, note_type, objs[po]["x"], objs[po]["y"], input_vector[0], input_vector[1], output_vector[0], output_vector[1], endpoint[0], endpoint[1]]);
-
-            # put data
-            if note_type == 1:
-                spinning = 0;
-                sliding = 0;
-            elif note_type == 2:
-                sliding = 1;
-                slider_end_time = objs[po]["sliderData"]["endTime"];
-            elif note_type == 3:
-                spinning = 1;
-                spinner_end_time = objs[po]["spinnerEndTime"];
-                # because the spinner sometimes get over 3 secs
-                last_obj_time = spinner_end_time;
-
+        if has_note:
             # TICK, TIME, NOTE, NOTE_TYPE, SLIDING, SPINNING, MOMENTUM, Ex1, Ex2, Ex3
-            data.append([i, tick, 1, note_type, sliding, spinning, momentum, ex1, ex2, ex3]);
-        elif spinning == 1:
-            if tick >= spinner_end_time - 5:
-                spinning = 0;
-                data.append([i, tick, 1, 5, 0, 0, 0, ex1, ex2, ex3]);
+            # For mania, NOTE_TYPE = Hit(1) HoldStartOnly(2) HoldStart+Note(3) HoldEndOnly(4)
+            #            SLIDING = SPINNING = MOMENTUM = 0
+            if has_note_end:
+                if has_hold:
+                    data.append([i, tick, 1, 3, 0, 0, 0, ex1, ex2, ex3])
+                else:
+                    data.append([i, tick, 1, 1, 0, 0, 0, ex1, ex2, ex3])
             else:
-                data.append([i, tick, 0, 0, 0, 1, 0, ex1, ex2, ex3]);
-        elif sliding == 1:
-            if tick >= slider_end_time - 5:
-                sliding = 0;
-                data.append([i, tick, 1, 4, 0, 0, 0, ex1, ex2, ex3]);
+                data.append([i, tick, 1, 2, 0, 0, 0, ex1, ex2, ex3])
+        else:
+            if has_note_end:
+                data.append([i, tick, 0, 4, 0, 0, 0, ex1, ex2, ex3])
             else:
-                data.append([i, tick, 0, 0, 1, 0, 0, ex1, ex2, ex3]);
-        else: # not found
-            if tick - last_obj_time < note_max_wait_time and tick >= start_time:
-                data.append([i, tick, 0, 0, 0, 0, 0, ex1, ex2, ex3]);
-    return data, flow_data;
+                data.append([i, tick, 0, 0, 0, 0, 0, ex1, ex2, ex3])
+
+        pattern_avail_hold.append(1 if has_hold else 0)
+        pattern_data.append(tick_pattern)
+        pattern_data_end.append(tick_pattern_end)
+
+    # everything limit to 4 metronomes (main_metronome)
+    for i, pattern_avail_hold in enumerate(pattern_avail_hold_grouped):
+        pattern_data = pattern_data_grouped[i]
+        pattern_data_end = pattern_data_end_grouped[i]
+
+        if len(pattern_avail_hold) < main_metronome * divisor:
+            added_len = main_metronome * divisor - len(pattern_avail_hold)
+            pattern_avail_hold += [0] * added_len
+            pattern_avail_hold_grouped[i] = pattern_avail_hold
+            pattern_data += [[0] * key_count] * added_len
+            pattern_data_grouped[i] = pattern_data
+            pattern_data_end += [[0] * key_count] * added_len
+            pattern_data_end_grouped[i] = pattern_data_end
+        if len(pattern_avail_hold) > main_metronome * divisor:
+            pattern_avail_hold = pattern_avail_hold[:main_metronome * divisor]
+            pattern_avail_hold_grouped[i] = pattern_avail_hold
+            pattern_data = pattern_data[:main_metronome * divisor]
+            pattern_data_grouped[i] = pattern_data
+            pattern_data_end = pattern_data_end[:main_metronome * divisor]
+            pattern_data_end_grouped[i] = pattern_data_end
+
+    if len(pattern_avail_hold_grouped) > 0:
+        pattern_avail_hold_expanded = np.expand_dims(pattern_avail_hold_grouped, axis=2)
+        pattern_data = np.concatenate([pattern_avail_hold_expanded, pattern_data_grouped, pattern_data_end_grouped], axis=2)
+    else:
+        pattern_data = np.zeros((0, main_metronome * divisor, 1 + 2 * key_count))
+
+    return data, pattern_data;

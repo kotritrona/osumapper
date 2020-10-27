@@ -312,6 +312,8 @@ def step2_evaluate(model):
     for i, k in enumerate(column_names):
         if i == 3: # No one uses spinners anyways
             continue;
+        if i == 2 and np.sum(actual_result[:, i]) == 0: # No sliders (Taiko)
+            continue;
         print("{} auc score: {}".format(k, roc_auc_score(actual_result[:, i], pred_result[:, i])))
 
 

@@ -12,6 +12,7 @@ def colab_clean_up(input_file_name):
             os.remove(item);
         except:
             pass
+    print("intermediate files cleaned up!")
 
 def load_pretrained_model(model_name):
     model_data = {

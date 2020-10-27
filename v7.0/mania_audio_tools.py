@@ -8,8 +8,7 @@ import librosa;
 import re, os, subprocess, json;
 import numpy as np;
 from os_tools import *;
-from map_analyze import *;
-from hitsound_tools import *;
+from mania_analyze import *;
 
 # It will always fail. Soundfile doesn't support mp3
 import warnings;
@@ -17,12 +16,6 @@ warnings.filterwarnings("ignore", message="PySoundFile failed. Trying audioread 
 
 workingdir = os.path.dirname(os.path.abspath(__file__));
 os.chdir(workingdir);
-
-# This ffmpeg path is unused
-if(os.path.isfile('./FFmpeg/ffmpeg.exe')):
-    FFMPEG_PATH = "FFmpeg\\ffmpeg.exe";
-else:
-    FFMPEG_PATH = "ffmpeg";
 
 def read_osu_file(path, convert=False, wav_name="wavfile.wav", json_name="temp_json_file.json"):
     """
@@ -122,7 +115,7 @@ def read_wav_data(timestamps, wavfile, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0
     std_data = np.tile(np.expand_dims(np.std(raw_data, axis=1), 1), (1, raw_data.shape[1], 1, 1));
     return (raw_data - norm_data) / std_data;
 
-def get_transformed_lst_data(data):
+def mania_transformed_lst_data(data):
     transformed_data = [];
     for d in data:
         if d[3] == 1:
@@ -130,10 +123,8 @@ def get_transformed_lst_data(data):
         elif d[3] == 2:
             transformed_data.append([d[0], d[1], d[2], 0, 1, 0, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9]]);
         elif d[3] == 3:
-            transformed_data.append([d[0], d[1], d[2], 0, 0, 1, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9]]);
+            transformed_data.append([d[0], d[1], d[2], 1, 1, 0, 1, 0, d[4], d[5], d[6], d[7], d[8], d[9]]);
         elif d[3] == 4:
-            transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 1, 0, d[4], d[5], d[6], d[7], d[8], d[9]]);
-        elif d[3] == 5:
             transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 1, 0, d[4], d[5], d[6], d[7], d[8], d[9]]);
         else:
             transformed_data.append([d[0], d[1], d[2], 0, 0, 0, 0, 0, d[4], d[5], d[6], d[7], d[8], d[9]]);
@@ -147,14 +138,16 @@ def read_and_save_osu_file(path, filename = "saved", divisor=4):
     #        table of [TICK, TIME, NOTE, IS_CIRCLE, IS_SLIDER, IS_SPINNER, IS_NOTE_END, UNUSED, SLIDING, SPINNING, MOMENTUM, EX1, EX2, EX3],
     #                     0,    1,    2,         3,         4,          5,           6,      7,        8,       9,       10
     #     - "wav" array, shape of [len(snapsize), MAPTICKS, 2, fft_size//4]
-    #     - "flow" array, table of [TICK, TIME, TYPE, X, Y, IN_DX, IN_DY, OUT_DX, OUT_DY] notes only
-    #     - "hs" array, shape [groups, metronome_count * divisor + 1]
+    #     - "pattern" array, shape [num_groups, main_metronome * divisor, 2 * key_count + 1]
+    #                        [:, :, 0]                         pattern_avail_hold
+    #                        [:, :, 1:1+key_count]             pattern_note_begin
+    #                        [:, :, 1+key_count:1+2*key_count] pattern_note_end
     #
     # MAPTICKS = (Total map time + 3000) / tickLength / (divisor = 4) - EMPTY_TICKS
     # EMPTY_TICKS = ticks where no note around in 5 secs
     """
     osu_dict, wav_file = read_osu_file(path, convert = True);
-    data, flow_data = get_map_notes(osu_dict, divisor=divisor);
+    data, pattern_data = get_map_notes_and_patterns(osu_dict, divisor=divisor);
     timestamps = [c[1] for c in data];
     wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);
     # in order to match first dimension
@@ -162,42 +155,9 @@ def read_and_save_osu_file(path, filename = "saved", divisor=4):
 
     # change the representation of note_type
     # a bit of copypaste code because I changed the data structure many times here
-    transformed_data = get_transformed_lst_data(data);
+    transformed_data = mania_transformed_lst_data(data);
 
-    # read hitsounds from circles for taiko mode
-    hs_data = get_circle_hitsounds(osu_dict, divisor=divisor);
-
-    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data, hs = hs_data);
-
-def read_and_save_timestamps(path, filename = "saved", divisor=4):
-    """
-    Only used in debugging
-    """
-    osu_dict, wav_file = read_osu_file(path, convert = True);
-    data, flow_data = get_map_notes(osu_dict, divisor=divisor);
-    timestamps = [c[1] for c in data];
-    with open(filename + "_ts.json", "w") as json_file:
-        json.dump(np.array(timestamps).tolist(), json_file);
-
-def read_and_save_osu_file_using_json_wavdata(path, json_path, filename = "saved", divisor=4):
-    """
-    Only used in debugging
-    """
-    osu_dict, wav_file = read_osu_file(path, convert = True);
-    data, flow_data = get_map_notes(osu_dict, divisor=divisor);
-    with open(json_path) as wav_json:
-        wav_data = json.load(wav_json)
-    # in order to match first dimension
-    # wav_data = np.swapaxes(wav_data, 0, 1);
-
-    # change the representation of note_type
-    # a bit of copypaste code because I changed the data structure many times here
-    transformed_data = get_transformed_lst_data(data);
-
-    # read hitsounds from circles for taiko mode
-    hs_data = get_circle_hitsounds(osu_dict, divisor=divisor);
-
-    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, flow = flow_data, hs = hs_data);
+    np.savez_compressed(filename, lst = transformed_data, wav = wav_data, pattern = pattern_data);
 
 def read_and_save_osu_tester_file(path, filename = "saved", json_name="mapthis.json", divisor=4):
     osu_dict, wav_file = read_osu_file(path, convert = True, json_name=json_name);
