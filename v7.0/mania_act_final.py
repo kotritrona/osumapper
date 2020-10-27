@@ -17,7 +17,7 @@ def convert_to_osu_mania_obj(notes, key_count):
     x_coords = [int(round((0.5+k)/key_count * 512)) for k in range(key_count)];
 
     for i, note in enumerate(notes):
-        begin, end, key = note;
+        begin, end, key, tick = note;
         if begin == end: # is a circle; does not consider spinner for now.
             obj_dict = {
                 "x": x_coords[key],

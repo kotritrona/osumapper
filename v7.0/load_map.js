@@ -1427,11 +1427,14 @@ function main()
 
             globalizeMap(json);
 
-            generateSliders(json);
+            let mode = json["general"]["Mode"] || 0;
+            if(mode < 3) {
+                generateSliders(json);
 
-            // json.obj = streamRegularizer(json.obj);
+                // json.obj = streamRegularizer(json.obj);
 
-            json.obj = newComboEvery2Metronome(json.obj, json.timing.uts);
+                json.obj = newComboEvery2Metronome(json.obj, json.timing.uts);
+            }
 
             /*
              * Hitsounds can be deep-learned as well, probably, but one main problem is

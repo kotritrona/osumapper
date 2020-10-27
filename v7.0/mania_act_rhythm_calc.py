@@ -371,10 +371,10 @@ def step5_build_pattern(rhythm_data, params, pattern_dataset = "mania_pattern_da
             if is_holding:
                 if has_note_end or has_note_begin or i >= hold_start_index + hold_max_ticks:
                     is_holding = False
-                    objs_current_key.append((hold_start, timestamp, k))
+                    objs_current_key.append((hold_start, timestamp, k, hold_start_index))
             else:
                 if has_note_begin and has_note_end:
-                    objs_current_key.append((timestamp, timestamp, k))
+                    objs_current_key.append((timestamp, timestamp, k, i))
                 elif has_note_begin:
                     is_holding = True
                     hold_start = timestamp
@@ -385,11 +385,101 @@ def step5_build_pattern(rhythm_data, params, pattern_dataset = "mania_pattern_da
     return objs_each_key
 
 def merge_objects_each_key(objs_each_key):
+    """
+    Merge all objects to a single array and sort against time.
+    Also outputs key count.
+    """
     objs = []
     for obj_group in objs_each_key:
         objs += obj_group
 
-    dt = np.dtype([('b', int),('e', int),('k', int)])
+    dt = np.dtype([('b', int),('e', int),('k', int),('t', int)])
     a = np.array(objs, dtype = dt)
 
     return np.sort(a, order = 'b'), len(objs_each_key)
+
+def mania_remove_trills(objs_each_key, mode=0):
+    """
+    Remove the 1/4 spaced adjacent notes to make the map perfectly playable.
+    It's a lazy hack for the obvious loophole in the note pattern algorithm.
+    Should set to inactive for low key counts.
+
+    mode 0: inactive
+    mode 1: remove latter note
+    mode 2: remove former note
+    mode 3: move note to next lane
+    mode 4: mode note to next lane, limiting to non-trill in next lane (should be internal use only)
+    """
+    if mode == 0:
+        return objs_each_key
+    if mode == 1:
+        for k, objs in enumerate(objs_each_key):
+            prev_obj = (-1, -1, -1, -100)
+            filtered_objs = []
+            for i, obj in enumerate(objs):
+                if obj[3] > prev_obj[3] + 1:
+                    filtered_objs.append(obj)
+                    prev_obj = obj
+            objs_each_key[k] = filtered_objs
+        return objs_each_key
+    if mode == 2:
+        for k, objs in enumerate(objs_each_key):
+            prev_obj = (-1, -1, -1, 2147483647)
+            filtered_objs = []
+            for i, obj in reversed(list(enumerate(objs))):
+                if obj[3] < prev_obj[3] - 1:
+                    filtered_objs.append(obj)
+                    prev_obj = obj
+            objs_each_key[k] = filtered_objs
+        return objs_each_key
+    if mode == 3 or mode == 4:
+        for k in range(len(objs_each_key)):
+            objs = objs_each_key[k]
+            prev_obj = (-1, -1, -1, -100)
+            filtered_objs = []
+            for i, obj in enumerate(objs):
+                if obj[3] > prev_obj[3] + 1:
+                    filtered_objs.append(obj)
+                    prev_obj = obj
+                else:
+                    target_key = (k+1) % len(objs_each_key)
+                    target_key_objs = objs_each_key[target_key]
+                    j = 0
+                    while target_key_objs[j][3] <= obj[3]:
+                        j += 1
+                        if j == len(target_key_objs):
+                            break
+                    j -= 1
+                    if mode == 3: # check if target spot is empty
+                        if j != len(target_key_objs) - 1:
+                            check_next = target_key_objs[j+1]
+                            if check_next[0] <= obj[1]:
+                                continue
+                        if target_key_objs[j][1] + 50 < obj[0]:
+                            new_obj = (obj[0], obj[1], target_key, obj[3])
+                            target_key_objs = target_key_objs[:j+1] + [new_obj] + target_key_objs[j+1:]
+                            objs_each_key[target_key] = target_key_objs
+                    if mode == 4: # check if target spot is empty and has no possible trills
+                        if j != len(target_key_objs) - 1:
+                            check_next = target_key_objs[j+1]
+                            if check_next[0] <= obj[1] or check_next[3] <= obj[3] + 1:
+                                continue
+                        if target_key_objs[j][1] + 50 < obj[0] and target_key_objs[j][3] + 1 < obj[3]:
+                            new_obj = (obj[0], obj[1], target_key, obj[3])
+                            target_key_objs = target_key_objs[:j+1] + [new_obj] + target_key_objs[j+1:]
+                            objs_each_key[target_key] = target_key_objs
+
+            objs_each_key[k] = filtered_objs
+
+        if mode == 3: # if mode is 3, do another pass with mode 4
+            return mania_remove_trills(objs_each_key, mode=4)
+        return objs_each_key
+
+
+def mania_modding(objs_each_key, modding_params):
+    """
+    I included it here since there is no reason to separate it into another file.
+    Does modding on the mania objects each key.
+    """
+    objs_each_key = mania_remove_trills(objs_each_key, mode = modding_params["remove_trills"])
+    return objs_each_key
