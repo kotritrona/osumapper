@@ -7,7 +7,7 @@ PreviewTime: -1
 Countdown: 0
 SampleSet: Soft
 StackLeniency: 0.5
-Mode: 0
+Mode: {game_mode}
 LetterboxInBreaks: 0
 WidescreenStoryboard: 1
 
