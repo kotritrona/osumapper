@@ -29,7 +29,7 @@ def load_pretrained_model(model_name):
             "pattern_dataset" : "models/mania_pattern/mania_pattern_dataset.npz".format(model_name),
             "rhythm_param" : [0.65, 0.4, [0, 0, 0, 0], 8, 5, 4],
             "modding" : {
-                "remove_trills" : 3
+                "remove_trills" : 0
             }
         },
         "highkey" : {
