@@ -27,7 +27,7 @@ def get_timed_osu_file(music_path, input_filename = "assets/template.osu", outpu
     bpm, offset = get_timing(music_path)
 
     osu_text = re.sub("{audio_filename}",     "audio.mp3", osu_text)
-    osu_text = re.sub("{game_mode}",          game_mode, osu_text)
+    osu_text = re.sub("{game_mode}",          str(game_mode), osu_text)
     osu_text = re.sub("{artist}",             artist, osu_text)
     osu_text = re.sub("{title}",              title, osu_text)
     osu_text = re.sub("{version}",            get_difficulty_name(), osu_text)
