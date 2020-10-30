@@ -88,11 +88,11 @@ def array_to_flags(arr):
 
 def step3_read_maps_pattern(params):
     pattern_length = -1
-    result_avail_note_begin = [[] for i in range(10)];
-    result_avail_note_end = [[] for i in range(10)];
-    result_avail_hold = [[] for i in range(10)];
-    result_pattern_note_begin = [[] for i in range(10)];
-    result_pattern_note_end = [[] for i in range(10)];
+    result_avail_note_begin =   [[] for i in range(18)];
+    result_avail_note_end =     [[] for i in range(18)];
+    result_avail_hold =         [[] for i in range(18)];
+    result_pattern_note_begin = [[] for i in range(18)];
+    result_pattern_note_end =   [[] for i in range(18)];
     for file in os.listdir(root):
         if file.endswith(".npz"):
             pattern_data = read_map_npz_pattern(os.path.join(root, file));
@@ -123,7 +123,7 @@ def step3_read_maps_pattern(params):
     if pattern_length == -1:
         pattern_length = 16
 
-    for key_index in range(10):
+    for key_index in range(18):
         if len(result_avail_note_begin[key_index]) == 0:
             outdata.append([np.array([]), np.array([]), np.array([]), np.zeros((0, pattern_length, 1 + key_index)), np.zeros((0, pattern_length, 1 + key_index))])
             continue
@@ -146,7 +146,7 @@ def step3_read_maps_pattern(params):
 
 def step3_save_pattern_dataset(data):
     save_dict = {}
-    for key_index in range(10):
+    for key_index in range(18):
         key_count = key_index + 1
         try:
             avail_note_begin, avail_note_end, avail_hold, pattern_note_begin, pattern_note_end = data[key_index]
