@@ -36,7 +36,7 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 200,
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2,
-                "box_loss_border" : 0.15,
+                "box_loss_border" : 0.125,
                 "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
@@ -65,7 +65,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 1,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.35,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -93,7 +93,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 1,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.35,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -149,7 +149,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.25,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -177,7 +177,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 1,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.25,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -205,7 +205,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : False,
                 "max_ticks_for_ds" : 2,
                 "box_loss_border" : 0.15,
-                "box_loss_value" : 0.35,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -233,7 +233,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 4,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.25,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -260,8 +260,8 @@ def load_pretrained_model(model_name):
                 "note_distance_basis" : 100,
                 "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 8,
-                "box_loss_border" : 0.1,
-                "box_loss_value" : 0.25,
+                "box_loss_border" : 0.15,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
@@ -290,7 +290,7 @@ def load_pretrained_model(model_name):
                 "next_from_slider_end" : True,
                 "max_ticks_for_ds" : 8,
                 "box_loss_border" : 0.1,
-                "box_loss_value" : 0.25,
+                "box_loss_value" : 0.4,
                 "box_loss_weight" : 1
             },
             "modding" : {
