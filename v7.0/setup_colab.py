@@ -19,6 +19,7 @@ def load_pretrained_model(model_name):
         "default" : {
             "rhythm_model" : "models/{}/rhythm_model".format(model_name),
             "flow_dataset" : "models/{}/flow_dataset.npz".format(model_name),
+            "hs_dataset" : "models/{}/hs_dataset.npz".format(model_name),
             "rhythm_param" : [1, 0.32, 0, [0, 0, 0, 0], 8],
             "gan" : {
                 "divisor" : 4,

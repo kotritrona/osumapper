@@ -8,9 +8,9 @@ demo map: https://osu.ppy.sh/beatmapsets/834264
 
 https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/Colab.ipynb
 
-## About v7.0
+## Complete guide for a newcomer in osu! mapping
 
-Currently WIP. You can use 6.2 or try it out now.
+https://github.com/kotritrona/osumapper/wiki/Complete-guide:-creating-beatmap-using-osumapper
 
 ## Installation & Model Running
 

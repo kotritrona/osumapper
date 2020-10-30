@@ -34,6 +34,10 @@ def divisor_array(k):
     d_range = list(range(0, divisor));
     return [int(k % divisor == d) for d in d_range];
 
+def step5_set_divisor(x = 4):
+    global divisor;
+    divisor = x;
+
 def step5_set_params(dist_multiplier=1, note_density=0.24, slider_favor=0, divisor_favor=[0] * divisor, slider_max_ticks=8):
     return dist_multiplier, note_density, slider_favor, divisor_favor, slider_max_ticks;
 

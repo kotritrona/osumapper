@@ -9,12 +9,8 @@ from audio_tools import *;
 import os, re, time;
 
 mapdata_path = "mapdata/";
-try:
-    divisor = GLOBAL["divisor"];
-except:
-    divisor = 4;
 
-def step4_read_new_map(file_path):
+def step4_read_new_map(file_path, divisor = 4):
     # Test paths and node
     test_process_path("node");
 

@@ -2,14 +2,13 @@
 
 This version uses Tensorflow v2.3.1.
 
-## TODO NEXT
-
-- train models
-- test with various maps
-
 ## Colaboratory
 
 https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/Colab.ipynb
+
+## Complete guide for a newcomer in osu! mapping
+
+https://github.com/kotritrona/osumapper/wiki/Complete-guide:-creating-beatmap-using-osumapper
 
 ## Installation
 
