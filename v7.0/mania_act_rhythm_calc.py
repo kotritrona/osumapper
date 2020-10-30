@@ -187,6 +187,9 @@ def get_randomized_pattern_group(key_count, metronome_length, note_metronome_gro
             random_from = [i for i in range(key_count) if group[t-1, i] == 0]
         else:
             random_from = [i for i in range(key_count)]
+
+        if len(random_from) == 0:
+            random_from = [i for i in range(key_count)]
         note_count = np.random.randint(0, max_note_count) + 1
         notes = np.random.choice(random_from, size = (note_count,), replace=False)
         for k in notes:
@@ -198,13 +201,13 @@ def get_pattern_group(data, note_metronome_group, note_end_metronome_group, hold
     Get a random group of pattern from the dataset.
     If it cannot find possible group in hs_data, create a randomized group.
     """
+
     metronome_length = data[3].shape[1]
     key_count = data[3].shape[2]
 
     if data[3].shape[0] == 0: # No data. Skip data and get random.
         randomized_group = get_randomized_pattern_group(key_count, metronome_length, note_metronome_group)
         return randomized_group, randomized_group, False
-
 
     note_begin_patterns, note_end_patterns = get_data_pattern_groups(data, note_metronome_group, note_end_metronome_group, hold_metronome_group, hold_min_return)
 
