@@ -300,7 +300,7 @@ def step5_build_pattern(rhythm_data, params, pattern_dataset = "mania_pattern_da
     # remove dist_multiplier
 
     unfiltered_objs = unfiltered_is_obj_pred[:, 0];
-    unfiltered_sv = (unfiltered_div_data[:,6] + 1) * 150;
+    unfiltered_sv = (unfiltered_div_data[:,2 + divisor] + 1) * 150;
     unfiltered_is_hold = unfiltered_predictions[:, 2];
     unfiltered_note_end = unfiltered_predictions[:, 4]; # check again if this is 0/1
 
