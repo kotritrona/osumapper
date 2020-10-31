@@ -17,21 +17,21 @@ from plot_tools import MyLine, plot_history;
 
 GAN_PARAMS = {
     "divisor" : 4,
-    "good_epoch" : 6,
-    "max_epoch" : 25,
+    "good_epoch" : 12,
+    "max_epoch" : 30,
     "note_group_size" : 10,
-    "g_epochs" : 7,
-    "c_epochs" : 3,
+    "g_epochs" : 1,
+    "c_epochs" : 1,
     "g_batch" : 50,
     "g_input_size" : 50,
-    "c_true_batch" : 50,
-    "c_false_batch" : 10,
-    "c_randfalse_batch" : 10,
+    "c_true_batch" : 140,
+    "c_false_batch" : 5,
+    "c_randfalse_batch" : 5,
     "note_distance_basis" : 200,
     "next_from_slider_end" : False,
-    "max_ticks_for_ds" : 2,
-    "box_loss_border" : 0.08,
-    "box_loss_value" : 0.15,
+    "max_ticks_for_ds" : 1,
+    "box_loss_border" : 0.1,
+    "box_loss_value" : 0.4,
     "box_loss_weight" : 1
 };
 
@@ -655,6 +655,10 @@ def step6_run_all(flow_dataset_npz = "flow_dataset.npz"):
 
     if next_from_slider_end:
         tick_diff = np.concatenate([[100], tick_diff[1:] - np.floor(slider_ticks * is_slider)[:-1]])
+
+    # Timing section reset == tick_diff < 0
+    # Use 1 as default value
+    tick_diff = np.where(tick_diff < 0, 1, tick_diff)
 
     note_distances = np.clip(tick_diff, 1, divisor * 2) * (note_distance_basis / divisor)
 
