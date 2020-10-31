@@ -7,7 +7,6 @@
 import tensorflow as tf
 from tensorflow import keras
 import numpy as np
-import matplotlib.pyplot as plt
 import os, re, json
 
 divisor = 4;
@@ -27,7 +26,9 @@ def read_npz(fn):
         ex2 = bpms / 120 - 1;
         ex3 = slider_lengths / 150 - 1;
 
-        div_data = np.array([divisor_array(k) + [ex1[k], ex2[k], ex3[k]] for k in ticks]);
+        # This might be confusing: "i" is the index of the tick, "k" is the tick count inside the uninherited timing section (red line)
+        # For most of the cases these are the same numbers, but for maps with multiple timing sections they're different
+        div_data = np.array([divisor_array(k) + [ex1[i], ex2[i], ex3[i]] for i, k in enumerate(ticks)]);
     return wav_data, div_data, ticks, timestamps;
 
 def divisor_array(k):

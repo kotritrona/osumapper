@@ -28,24 +28,36 @@ def get_tick_len(map_json, tick):
     uts_a = map_json["timing"]["uts"];
     if tick < uts_a[0]["beginTime"]:
         return uts_a[0]["tickLength"];
-    for uts in reversed(uts_a):
+    _out = 600;
+    for uts in uts_a:
         if tick >= uts["beginTime"]:
-            return uts["tickLength"];
+            _out = uts["tickLength"];
+        else:
+            return _out;
+    return _out;
 
 def get_slider_len(map_json, tick):
     ts_a = map_json["timing"]["ts"];
     if tick < ts_a[0]["beginTime"]:
         return ts_a[0]["sliderLength"];
-    for ts in reversed(ts_a):
+    _out = 100;
+    for ts in ts_a:
         if tick >= ts["beginTime"]:
-            return ts["sliderLength"];
+            _out = ts["sliderLength"];
+        else:
+            return _out;
+    return _out;
 
 def get_slider_len_ts(ts_a, tick):
     if tick < ts_a[0]["beginTime"]:
         return ts_a[0]["sliderLength"];
-    for ts in reversed(ts_a):
+    _out = 100;
+    for ts in ts_a:
         if tick >= ts["beginTime"]:
-            return ts["sliderLength"];
+            _out = ts["sliderLength"];
+        else:
+            return _out;
+    return _out;
 
 def get_end_time(note):
     if note["type"] & 8:
