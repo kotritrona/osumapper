@@ -6,7 +6,7 @@ This version uses Tensorflow v2.3.1.
 
 https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/Colab.ipynb
 
-For mania mode: https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/mania_Colab.ipynb
+For mania mode: [mania_Colab.ipynb](https://colab.research.google.com/github/kotritrona/osumapper/blob/master/v7.0/mania_Colab.ipynb)
 
 ## Complete guide for a newcomer in osu! mapping
 
