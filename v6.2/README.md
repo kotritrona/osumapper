@@ -2,6 +2,8 @@
 
 This version uses Tensorflow v2.0.0-beta1.
 
+v6.2 demo map: https://osu.ppy.sh/beatmapsets/834264
+
 ## Installation:
 - install Python (3.5.x or 3.6.x or 3.7.x) and Jupyter notebook
 - install [node.js](https://nodejs.org/)

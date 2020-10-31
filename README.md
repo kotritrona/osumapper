@@ -2,7 +2,8 @@
 
 An automatic beatmap generator using Tensorflow / Deep Learning.
 
-demo map: https://osu.ppy.sh/beatmapsets/834264
+demo map 1 (low BPM): https://osu.ppy.sh/beatmapsets/1290030
+demo map 2 (high BPM): https://osu.ppy.sh/beatmapsets/1290026
 
 ## Colaboratory
 
