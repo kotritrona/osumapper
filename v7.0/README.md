@@ -3,6 +3,7 @@
 This version uses Tensorflow v2.3.1.
 
 v7.0 demo map 1 (low BPM): https://osu.ppy.sh/beatmapsets/1290030
+
 v7.0 demo map 2 (high BPM): https://osu.ppy.sh/beatmapsets/1290026
 
 ## Colaboratory
