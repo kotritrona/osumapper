@@ -296,8 +296,8 @@ def step5_build_pattern(rhythm_data, params, pattern_dataset = "mania_pattern_da
     unfiltered_timestamps = unfiltered_timestamps_long[:unfiltered_is_obj_pred.shape[0]]
     unfiltered_ticks = unfiltered_ticks_long[:unfiltered_is_obj_pred.shape[0]]
 
-    # remove_trill, pattern_rotate
-    # trills: divert, remove_front, remove_end
+    # key_fix, pattern_rotate
+    # key_fix: remove_front, remove_end, divert
     # remove dist_multiplier
 
     unfiltered_objs = unfiltered_is_obj_pred[:, 0];
@@ -407,7 +407,7 @@ def merge_objects_each_key(objs_each_key):
 
     return np.sort(a, order = 'b'), len(objs_each_key)
 
-def mania_remove_trills(objs_each_key, mode=0):
+def mania_key_fix(objs_each_key, mode=0):
     """
     Remove the 1/4 spaced adjacent notes to make the map perfectly playable.
     It's a lazy hack for the obvious loophole in the note pattern algorithm.
@@ -417,7 +417,7 @@ def mania_remove_trills(objs_each_key, mode=0):
     mode 1: remove latter note
     mode 2: remove former note
     mode 3: move note to next lane
-    mode 4: mode note to next lane, limiting to non-trill in next lane (should be internal use only)
+    mode 4: mode note to next lane, limiting to no adjacent note in next lane (should be internal use only)
     """
     if mode == 0:
         return objs_each_key
@@ -468,7 +468,7 @@ def mania_remove_trills(objs_each_key, mode=0):
                             new_obj = (obj[0], obj[1], target_key, obj[3])
                             target_key_objs = target_key_objs[:j+1] + [new_obj] + target_key_objs[j+1:]
                             objs_each_key[target_key] = target_key_objs
-                    if mode == 4: # check if target spot is empty and has no possible trills
+                    if mode == 4: # check if target spot is empty and has no possible double keys
                         if j != len(target_key_objs) - 1:
                             check_next = target_key_objs[j+1]
                             if check_next[0] <= obj[1] or check_next[3] <= obj[3] + 1:
@@ -481,7 +481,7 @@ def mania_remove_trills(objs_each_key, mode=0):
             objs_each_key[k] = filtered_objs
 
         if mode == 3: # if mode is 3, do another pass with mode 4
-            return mania_remove_trills(objs_each_key, mode=4)
+            return mania_key_fix(objs_each_key, mode=4)
         return objs_each_key
 
 
@@ -490,5 +490,5 @@ def mania_modding(objs_each_key, modding_params):
     I included it here since there is no reason to separate it into another file.
     Does modding on the mania objects each key.
     """
-    objs_each_key = mania_remove_trills(objs_each_key, mode = modding_params["remove_trills"])
+    objs_each_key = mania_key_fix(objs_each_key, mode = modding_params["key_fix"])
     return objs_each_key

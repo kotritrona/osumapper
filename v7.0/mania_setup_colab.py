@@ -21,7 +21,7 @@ def load_pretrained_model(model_name):
             "pattern_dataset" : "models/{}/mania_pattern_dataset.npz".format(model_name),
             "rhythm_param" : [0.5, 0.2, [0, 0, 0, 0], 8, 1, 4],
             "modding" : {
-                "remove_trills" : 3
+                "key_fix" : 3
             }
         },
         "lowkey" : {
@@ -29,7 +29,7 @@ def load_pretrained_model(model_name):
             "pattern_dataset" : "models/mania_pattern/mania_pattern_dataset.npz".format(model_name),
             "rhythm_param" : [0.65, 0.4, [0, 0, 0, 0], 8, 5, 4],
             "modding" : {
-                "remove_trills" : 0
+                "key_fix" : 0
             }
         },
         "highkey" : {
@@ -37,7 +37,7 @@ def load_pretrained_model(model_name):
             "pattern_dataset" : "models/mania_pattern/mania_pattern_dataset.npz".format(model_name),
             "rhythm_param" : [0.45, 0.12, [0, 0, 0, 0], 8, 5, 4],
             "modding" : {
-                "remove_trills" : 3
+                "key_fix" : 3
             }
         }
     };
