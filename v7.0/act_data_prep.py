@@ -24,6 +24,9 @@ def step1_load_maps():
     if not os.path.isdir(mapdata_path):
         os.mkdir(mapdata_path);
 
+    # Test node modules..?
+    test_node_modules()
+
     # Open maplist
     with open("maplist.txt", encoding="utf8") as fp:
         fcont = fp.readlines();
