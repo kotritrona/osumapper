@@ -14,3 +14,9 @@ def fix_path():
     path = os.path.dirname(__file__)
     if len(path) > 1:
         os.chdir(path)
+
+def test_node_modules():
+    has_node_modules = os.path.isdir("node_modules/")
+    if not has_node_modules:
+        print("node_modules not found! please run `npm install` first.")
+        assert has_node_modules

@@ -5,6 +5,7 @@
 #
 
 from audio_tools import *;
+from os_tools import *;
 
 import os, re, time;
 
@@ -15,6 +16,9 @@ except:
     divisor = 4;
 
 def step1_load_maps():
+    # fix the path..?
+    fix_path()
+
     # Test paths and node
     test_process_path("node");
     if not os.path.isdir(mapdata_path):

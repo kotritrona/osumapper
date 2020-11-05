@@ -15,6 +15,9 @@ def step4_read_new_map(file_path, divisor = 4):
     # fix the path..?
     fix_path()
 
+    # Test node modules..?
+    test_node_modules()
+
     # Test paths and node
     test_process_path("node");
 
