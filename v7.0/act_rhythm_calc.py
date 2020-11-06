@@ -43,6 +43,11 @@ def step5_set_params(dist_multiplier=1, note_density=0.24, slider_favor=0, divis
     return dist_multiplier, note_density, slider_favor, divisor_favor, slider_max_ticks;
 
 def step5_load_model(model_file="saved_rhythm_model"):
+    # Fallback for local version
+    if not os.path.isfile(model_file) and model_file == "saved_rhythm_model":
+        print("Model not trained! Trying default model...")
+        model_file = "models/default/rhythm_model"
+
     model = tf.keras.models.load_model(
         model_file,
         custom_objects=None,

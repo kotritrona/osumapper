@@ -662,6 +662,11 @@ def step6_run_all(flow_dataset_npz = "flow_dataset.npz"):
 
     note_distances = np.clip(tick_diff, 1, divisor * 2) * (note_distance_basis / divisor)
 
+    # Fallback for local version
+    if not os.path.isfile(flow_dataset_npz) and flow_dataset_npz == "flow_dataset.npz":
+        print("Flow dataset not found! Trying default model...")
+        flow_dataset_npz = "models/default/flow_dataset.npz"
+
     # Load the flow dataset saved in part 4
     with np.load(flow_dataset_npz) as flow_dataset:
         maps = flow_dataset["maps"];

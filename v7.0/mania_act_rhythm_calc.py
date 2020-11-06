@@ -39,6 +39,11 @@ def step5_set_params(note_density=0.24, hold_favor=0, divisor_favor=[0] * diviso
     return note_density, hold_favor, divisor_favor, hold_max_ticks, hold_min_return, rotate_mode;
 
 def step5_load_model(model_file="saved_rhythm_model"):
+    # Fallback for local version
+    if not os.path.isfile(model_file) and model_file == "saved_rhythm_model":
+        print("Model not trained! Trying default model...")
+        model_file = "models/default/rhythm_model"
+
     model = tf.keras.models.load_model(
         model_file,
         custom_objects=None,
@@ -309,6 +314,11 @@ def step5_build_pattern(rhythm_data, params, pattern_dataset = "mania_pattern_da
 
     # load key count from json
     key_count = read_key_count_from_json()
+
+    # Fallback for local version
+    if not os.path.isfile(pattern_dataset) and pattern_dataset == "mania_pattern_dataset.npz":
+        print("Pattern dataset not found! Trying default model...")
+        pattern_dataset = "models/mania_pattern/mania_pattern_dataset.npz"
 
     # load pattern data
     pattern_data = load_pattern_dataset(key_count, pattern_dataset)
