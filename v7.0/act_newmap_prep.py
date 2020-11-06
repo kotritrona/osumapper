@@ -18,6 +18,9 @@ def step4_read_new_map(file_path, divisor = 4):
     # Test paths and node
     test_process_path("node");
 
+    # Test ffmpeg..?
+    test_process_path("ffmpeg", "-version");
+
     # Test node modules
     test_node_modules()
 

@@ -27,6 +27,9 @@ def step1_load_maps():
     # Test node modules..?
     test_node_modules()
 
+    # Test ffmpeg..?
+    test_process_path("ffmpeg", "-version");
+
     # Open maplist
     with open("maplist.txt", encoding="utf8") as fp:
         fcont = fp.readlines();

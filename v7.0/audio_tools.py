@@ -224,12 +224,12 @@ def read_and_return_osu_file(path, divisor=4):
     wav_data = read_wav_data(timestamps, wav_file, snapint=[-0.3, -0.2, -0.1, 0, 0.1, 0.2, 0.3], fft_size = 128);
     return data, wav_data, flow_data;
 
-def test_process_path(path):
+def test_process_path(path, version_var="--version"):
     """
     Use the version command to test if a dependency works
     """
     try:
-        subprocess.call([path, "--version"]);
+        subprocess.call([path, version_var]);
         return True;
     except:
         print("Cannot find executable on {}".format(path));
