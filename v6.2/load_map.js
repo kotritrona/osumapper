@@ -76,12 +76,12 @@ function parseDiffdata(diffData)
 	var AR_Correspondence = [1800,1700,1600,1450,1325,1200,1050,900,750,600,450];
 	var CS_Correspondence = [128/128,118/128,108/128,98/128,88/128,78/128,68/128,56/128,46/128,36/128,26/128];
     diffSettings = {};
-	diffSettings.HD = Math.min(parseFloat(diffData.match(/HPDrainRate:([0-9\.]+)/i)[1]),10);
-	diffSettings.CS = parseFloat(diffData.match(/CircleSize:([0-9\.]+)/i)[1]);
-	diffSettings.OD = parseFloat(diffData.match(/OverallDifficulty:([0-9\.]+)/i)[1]);
-	diffSettings.SV = parseFloat(diffData.match(/SliderMultiplier:([0-9\.]+)/i)[1]);
-	diffSettings.STR = Math.min(parseInt(diffData.match(/SliderTickRate:([0-9]+)/i)[1]),8);
-	var AR = diffData.match(/ApproachRate:([0-9\.]+)/i);
+	diffSettings.HD = Math.min(parseFloat(diffData.match(/HPDrainRate: ?(\d+(\.\d+)?)/i)[1]),10);
+	diffSettings.CS = parseFloat(diffData.match(/CircleSize: ?(\d+(\.\d+)?)/i)[1]);
+	diffSettings.OD = parseFloat(diffData.match(/OverallDifficulty: ?(\d+(\.\d+)?)/i)[1]);
+	diffSettings.SV = parseFloat(diffData.match(/SliderMultiplier: ?(\d+(\.\d+)?)/i)[1]);
+	diffSettings.STR = Math.min(parseInt(diffData.match(/SliderTickRate: ?(\d+(\.\d+)?)/i)[1]),8);
+	var AR = diffData.match(/ApproachRate: ?(\d+(\.\d+)?)/i);
 	if(AR != null)
 	{
 		AR = parseFloat(AR[1]);
