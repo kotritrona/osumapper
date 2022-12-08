@@ -4,7 +4,7 @@
   "description": "An automatic beatmap generator using Tensorflow / Deep Learning.",
   "main": "load_map.js",
   "dependencies": {
-    "express": "^4.17.1",
+    "express": "^4.18.2",
     "opn": "^6.0.0",
     "osu-buffer": "^1.3.5",
     "polynomial": "^1.4.3",
